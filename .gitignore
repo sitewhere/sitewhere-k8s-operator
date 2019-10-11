@@ -1,0 +1,15 @@
+/bin
+/deploy
+/target
+/.vscode/
+### Gradle ###
+build
+.gradle*
+/.settings/
+/.project
+.classpath
+.settings/
+bin/
+build/
+target/
+
