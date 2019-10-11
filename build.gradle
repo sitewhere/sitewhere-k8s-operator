@@ -5,6 +5,7 @@ buildscript {
 	dependencies {
 		classpath 'com.bmuschko:gradle-docker-plugin:4.6.0'
 		classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
+		classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
 	}
 }
 
@@ -55,6 +56,8 @@ allprojects {
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     
+    apply plugin: 'com.github.johnrengelman.shadow'
+    
 	jar {
 	    manifest {
 	        attributes('Implementation-Title': project.name,
@@ -72,20 +75,20 @@ allprojects {
 }
 
 // Create a Dockerfile.
-task dockerFile(type: com.bmuschko.gradle.docker.tasks.image.Dockerfile, dependsOn: jar) {
+task dockerFile(type: com.bmuschko.gradle.docker.tasks.image.Dockerfile, dependsOn: shadowJar) {
     destFile = project.file('build/docker/Dockerfile')
     from "${rootProject.ext['docker.base.image']}"
 	instruction "LABEL maintainer=${rootProject.ext['docker.maintainer']}"
 		
 	// Copy Spring Boot jar.
-	copyFile("${project.name}-${project.version}.jar", "/")
+	copyFile("${project.name}-${project.version}-all.jar", "/")
 			
-	defaultCommand 'java', '-server', '-Xmx512M', '-Xss384K', '-jar', "/${project.name}-${project.version}.jar"	
+	defaultCommand 'java', '-server', '-Xmx512M', '-Xss384K', '-jar', "/${project.name}-${project.version}-all.jar"	
 }
 
 // Copy artifact to Docker input folder.
 task copyArtifactsToDocker(type: Copy, dependsOn: dockerFile) {
-    from "${buildDir}/libs/${project.name}-${project.version}.jar"
+    from "${buildDir}/libs/${project.name}-${project.version}-all.jar"
     into 'build/docker'
 }
 
