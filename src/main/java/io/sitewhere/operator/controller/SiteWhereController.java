@@ -17,7 +17,7 @@ import io.fabric8.kubernetes.client.informers.ResourceEventHandler;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.cache.Cache;
 import io.fabric8.kubernetes.client.informers.cache.Lister;
-import io.sitewhere.operator.crd.SiteWhereInstance;
+import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 
 public class SiteWhereController {
 
@@ -95,6 +95,8 @@ public class SiteWhereController {
 		LOGGER.info("Would be reconciling SiteWhereInstance.");
 	    } catch (InterruptedException interruptedException) {
 		LOGGER.log(Level.SEVERE, "controller interrupted..");
+	    } catch (Throwable t) {
+		LOGGER.log(Level.SEVERE, "Unhandled exception in controller.", t);
 	    }
 	}
     }

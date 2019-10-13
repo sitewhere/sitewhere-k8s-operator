@@ -68,7 +68,7 @@ allprojects {
     
 	// Library dependencies.
     dependencies {
-		compile group: 'io.fabric8', name: 'kubernetes-client', version: "${rootProject.ext['fabric8.version']}"
+		compile group: 'io.sitewhere', name: 'sitewhere-k8s-model', version: "2.3.0"
 		
         testCompile group: 'junit', name: 'junit'
     }

@@ -12,9 +12,9 @@ import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
+import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
+import io.sitewhere.k8s.crd.instance.SiteWhereInstanceList;
 import io.sitewhere.operator.controller.SiteWhereController;
-import io.sitewhere.operator.crd.SiteWhereInstance;
-import io.sitewhere.operator.crd.SiteWhereInstanceList;
 
 /**
  * Main class for operator.
@@ -25,7 +25,7 @@ public class SiteWhereOperator {
 	try (KubernetesClient client = new DefaultKubernetesClient()) {
 
 	    CustomResourceDefinitionContext instanceDefinitionContext = new CustomResourceDefinitionContext.Builder()
-		    .withVersion("v1alpha1").withScope("Namespaced").withGroup("sitewhere.io")
+		    .withVersion("v1alpha3").withScope("Namespaced").withGroup("sitewhere.io")
 		    .withPlural("sitewhereinstances").build();
 
 	    SharedInformerFactory informerFactory = client.informers();
