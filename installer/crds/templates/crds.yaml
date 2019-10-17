@@ -1,1 +1,1 @@
-{{ .Files.Get "files/crd-21.yaml" }}
+{{ .Files.Get "files/crd-22.yaml" }}

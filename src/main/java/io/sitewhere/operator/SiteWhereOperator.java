@@ -7,38 +7,98 @@
  */
 package io.sitewhere.operator;
 
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
 import io.fabric8.kubernetes.client.DefaultKubernetesClient;
-import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
-import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
+import io.fabric8.kubernetes.client.NamespacedKubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
-import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
-import io.sitewhere.k8s.crd.instance.SiteWhereInstanceList;
-import io.sitewhere.operator.controller.SiteWhereController;
+import io.sitewhere.operator.controller.instance.SiteWhereInstanceController;
 
 /**
  * Main class for operator.
  */
 public class SiteWhereOperator {
 
+    /** Static logger instance */
+    private static Logger LOGGER = LoggerFactory.getLogger(SiteWhereOperator.class);
+
+    /** Tracks shutdown */
+    private static CountDownLatch SHUTDOWN = new CountDownLatch(1);
+
     public static void main(String[] args) {
-	try (KubernetesClient client = new DefaultKubernetesClient()) {
+	// Thread pool used for controller loops.
+	ExecutorService loopsPool = Executors.newFixedThreadPool(1, new EventLoopThreadFactory());
 
-	    CustomResourceDefinitionContext instanceDefinitionContext = new CustomResourceDefinitionContext.Builder()
-		    .withVersion("v1alpha3").withScope("Namespaced").withGroup("sitewhere.io")
-		    .withPlural("sitewhereinstances").build();
+	// Catch shutdown signal.
+	addShutdownHook();
 
-	    SharedInformerFactory informerFactory = client.informers();
+	LOGGER.info("\n\nStarting SiteWhere Kubernetes Operator\n");
 
-	    SharedIndexInformer<SiteWhereInstance> instanceSharedIndexInformer = informerFactory
-		    .sharedIndexInformerForCustomResource(instanceDefinitionContext, SiteWhereInstance.class,
-			    SiteWhereInstanceList.class, 10 * 60 * 1000);
-	    SiteWhereController sitewhereController = new SiteWhereController(client, instanceSharedIndexInformer);
+	NamespacedKubernetesClient client = null;
+	SharedInformerFactory informerFactory = null;
+	try {
+	    Config config = new ConfigBuilder().withNamespace(null).build();
+	    client = new DefaultKubernetesClient(config);
+	    LOGGER.info(
+		    String.format("Kubernetes client using namespace: %s", client.getConfiguration().getNamespace()));
+	    informerFactory = client.informers();
 
-	    sitewhereController.create();
+	    // Create controllers.
+	    SiteWhereInstanceController instanceController = new SiteWhereInstanceController(client, informerFactory);
+
+	    // Start informers.
 	    informerFactory.startAllRegisteredInformers();
 
-	    sitewhereController.run();
+	    // Start event loops.
+	    loopsPool.execute(instanceController.createEventLoop());
+
+	    SHUTDOWN.await();
+	} catch (InterruptedException e) {
+	    LOGGER.warn("Operator shutting down.");
+	} finally {
+	    if (informerFactory != null) {
+		LOGGER.info("Shutting down informers.");
+		informerFactory.stopAllRegisteredInformers();
+	    }
+	    if (loopsPool != null) {
+		LOGGER.info("Shutting down event loops.");
+		loopsPool.shutdownNow();
+	    }
+	    if (client != null) {
+		LOGGER.info("Closing client.");
+		client.close();
+	    }
+	}
+    }
+
+    /**
+     * Add hook to close everything at shutdown.
+     */
+    protected static void addShutdownHook() {
+	Runtime.getRuntime().addShutdownHook(new Thread() {
+	    public void run() {
+		SHUTDOWN.countDown();
+	    }
+	});
+    }
+
+    /** Used for naming controller event loop threads */
+    private static class EventLoopThreadFactory implements ThreadFactory {
+
+	/** Counts threads */
+	private AtomicInteger counter = new AtomicInteger();
+
+	public Thread newThread(Runnable r) {
+	    return new Thread(r, "Event Loop " + counter.incrementAndGet());
 	}
     }
 }

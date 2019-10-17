@@ -2,3 +2,6 @@ apiVersion: sitewhere.io/v1alpha3
 kind: SiteWhereInstance
 metadata:
   name: test-instance
+spec:
+  instanceNamespace: sitewhere
+  configurationTemplate: instance-config-default

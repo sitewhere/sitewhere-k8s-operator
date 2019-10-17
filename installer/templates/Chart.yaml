@@ -1,8 +1,8 @@
 apiVersion: v1
-name: crds
+name: defaults
 version: 2.2.0
 tillerVersion: ">=2.7.2"
-description: Helm chart for deploying SiteWhere CRDs
+description: Helm chart for deploying default resources such as templates
 keywords:
   - sitewhere
 sources:
