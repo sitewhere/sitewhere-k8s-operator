@@ -10,5 +10,23 @@ package io.sitewhere.operator.controller;
 public class ResourceLabels {
 
     /** Label for SiteWhere instance name */
+    public static final String LABEL_SITEWHERE_NAME = "sitewhere.io/name";
+
+    /** Label for SiteWhere role name */
+    public static final String LABEL_SITEWHERE_ROLE = "sitewhere.io/role";
+
+    /** Label for SiteWhere instance name */
     public static final String LABEL_SITEWHERE_INSTANCE = "sitewhere.io/instance";
+
+    /** Label for Kubernetes name */
+    public static final String LABEL_K8S_NAME = "app.kubernetes.io/name";
+
+    /** Label for Kubernetes instance */
+    public static final String LABEL_K8S_INSTANCE = "app.kubernetes.io/instance";
+
+    /** Label for Kubernetes managed by */
+    public static final String LABEL_K8S_MANAGED_BY = "app.kubernetes.io/managed-by";
+
+    /** Label for Helm chart name */
+    public static final String LABEL_HELM_CHART = "helm.sh/chart";
 }

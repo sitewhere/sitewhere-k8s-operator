@@ -49,8 +49,6 @@ public class SiteWhereOperator {
 	try {
 	    Config config = new ConfigBuilder().withNamespace(null).build();
 	    client = new DefaultKubernetesClient(config);
-	    LOGGER.info(
-		    String.format("Kubernetes client using namespace: %s", client.getConfiguration().getNamespace()));
 	    informerFactory = client.informers();
 
 	    // Create controllers.

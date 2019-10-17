@@ -21,7 +21,6 @@ import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import io.fabric8.kubernetes.client.dsl.base.CustomResourceDefinitionContext;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import io.sitewhere.k8s.crd.instance.DoneableSiteWhereInstance;
@@ -33,6 +32,7 @@ import io.sitewhere.k8s.crd.instance.configuration.InstanceConfigurationTemplate
 import io.sitewhere.k8s.crd.instance.configuration.InstanceConfigurationTemplateList;
 import io.sitewhere.operator.controller.ApiConstants;
 import io.sitewhere.operator.controller.ResourceChangeType;
+import io.sitewhere.operator.controller.ResourceContexts;
 import io.sitewhere.operator.controller.ResourceLabels;
 import io.sitewhere.operator.controller.SiteWhereResourceController;
 
@@ -50,11 +50,6 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
     /** Workers for handling instance resource tasks */
     private ExecutorService instanceWorkers = Executors.newFixedThreadPool(2);
 
-    /** Context used for accessing instances */
-    private static CustomResourceDefinitionContext CONTEXT = new CustomResourceDefinitionContext.Builder()
-	    .withVersion(ApiConstants.SITEWHERE_API_VERSION).withGroup(ApiConstants.SITEWHERE_API_GROUP)
-	    .withPlural(ApiConstants.SITEWHERE_INSTANCE_CRD_PLURAL).build();
-
     public SiteWhereInstanceController(KubernetesClient client, SharedInformerFactory informerFactory) {
 	super(client, informerFactory);
     }
@@ -63,8 +58,8 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
      * Create informer.
      */
     public SharedIndexInformer<SiteWhereInstance> createInformer() {
-	return getInformerFactory().sharedIndexInformerForCustomResource(CONTEXT, SiteWhereInstance.class,
-		SiteWhereInstanceList.class, RESYNC_PERIOD_MS);
+	return getInformerFactory().sharedIndexInformerForCustomResource(ResourceContexts.INSTANCE_CONTEXT,
+		SiteWhereInstance.class, SiteWhereInstanceList.class, RESYNC_PERIOD_MS);
     }
 
     /*
@@ -134,7 +129,7 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
      * @return
      */
     protected SiteWhereInstance processInstanceConfigurationTemplate(SiteWhereInstance instance) {
-	LOGGER.info(String.format("Verifying that instance template `%s` exists.",
+	LOGGER.info(String.format("Verifying that instance template '%s' exists.",
 		instance.getSpec().getConfigurationTemplate()));
 
 	// Set initial flags based on what user provided in yaml.
@@ -147,11 +142,11 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
 	// Verify that instance configuration template exists.
 	InstanceConfigurationTemplate ict = resolveInstanceConfigurationTemplate(instance);
 	if (ict == null) {
-	    LOGGER.info(String.format("Instance template `%s` was not found.",
+	    LOGGER.info(String.format("Instance template '%s' was not found.",
 		    instance.getSpec().getConfigurationTemplate()));
 	    return null;
 	}
-	LOGGER.info(String.format("Instance template `%s` verified.", instance.getSpec().getConfigurationTemplate()));
+	LOGGER.info(String.format("Instance template '%s' verified.", instance.getSpec().getConfigurationTemplate()));
 
 	// Copy instance configuration from template if not already set.
 	boolean hadInstanceConfiguration = instance.getSpec().getInstanceConfiguration() != null;

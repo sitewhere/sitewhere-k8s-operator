@@ -57,6 +57,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
      * Start event handling.
      */
     protected void startEventHandling() {
+	LOGGER.info("Starting event handler for resource updates.");
 	getInformer().addEventHandler(new ResourceEventHandler<T>() {
 	    @Override
 	    public void onAdd(T resource) {
@@ -123,7 +124,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
 	 * @see java.lang.Runnable#run()
 	 */
 	public void run() {
-	    LOGGER.info("Starting processing loop.");
+	    LOGGER.info("Starting event processing loop.");
 	    while (!getInformer().hasSynced()) {
 		try {
 		    Thread.sleep(200);

@@ -9,6 +9,9 @@ package io.sitewhere.operator.controller;
 
 public class ApiConstants {
 
+    /** SiteWhere application name */
+    public static final String SITEWHERE_APP_NAME = "sitewhere";
+
     /** SiteWhere CRD API version */
     public static final String SITEWHERE_API_VERSION = "v1alpha3";
 
