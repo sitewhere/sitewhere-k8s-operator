@@ -53,7 +53,7 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
     /** Context used for accessing instances */
     private static CustomResourceDefinitionContext CONTEXT = new CustomResourceDefinitionContext.Builder()
 	    .withVersion(ApiConstants.SITEWHERE_API_VERSION).withGroup(ApiConstants.SITEWHERE_API_GROUP)
-	    .withPlural("sitewhereinstances").build();
+	    .withPlural(ApiConstants.SITEWHERE_INSTANCE_CRD_PLURAL).build();
 
     public SiteWhereInstanceController(KubernetesClient client, SharedInformerFactory informerFactory) {
 	super(client, informerFactory);

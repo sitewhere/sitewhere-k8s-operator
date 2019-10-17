@@ -21,9 +21,16 @@ public class ApiConstants {
     /** InstanceConfigurationTemplate CRD plural */
     public static final String SITEWHERE_ICT_CRD_PLURAL = "instanceconfigurationtemplates";
 
-    /** SiteWhereInstance CRD plural */
+    /** SiteWhereMicroservice CRD plural */
+    public static final String SITEWHERE_MICROSERVICE_CRD_PLURAL = "sitewheremicroservices";
+
+    /** SiteWhereInstance CRD name */
     public static final String SITEWHERE_INSTANCE_CRD_NAME = SITEWHERE_INSTANCE_CRD_PLURAL + "." + SITEWHERE_API_GROUP;
 
-    /** InstanceConfigurationTemplate CRD plural */
+    /** InstanceConfigurationTemplate CRD name */
     public static final String SITEWHERE_ICT_CRD_NAME = SITEWHERE_ICT_CRD_PLURAL + "." + SITEWHERE_API_GROUP;
+
+    /** SiteWhereMicroservice CRD name */
+    public static final String SITEWHERE_MICROSERVICE_CRD_NAME = SITEWHERE_MICROSERVICE_CRD_PLURAL + "."
+	    + SITEWHERE_API_GROUP;
 }
