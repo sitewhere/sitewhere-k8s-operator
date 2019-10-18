@@ -93,6 +93,21 @@ spec:
         command: ["/bin/grpc_health_probe", "-addr=:9003"]
       initialDelaySeconds:
       periodSeconds: 60
+  serviceSpec:
+    type: LoadBalancer
+    ports:
+      - port: 9000
+        targetPort: 9000
+        protocol: TCP
+        name: grpc-api
+      - port: 9001
+        targetPort: 9001
+        protocol: TCP
+        name: grpc-management
+      - port: 9090
+        targetPort: 9090
+        protocol: TCP
+        name: http-metrics
   debug:
     enabled: false
     jdwpPort: 8006

@@ -68,7 +68,7 @@ allprojects {
     
 	// Library dependencies.
     dependencies {
-		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: "0.0.2"
+		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: "0.0.3"
 	
     	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.1'
 		

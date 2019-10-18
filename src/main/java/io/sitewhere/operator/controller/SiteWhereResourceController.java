@@ -42,7 +42,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
     private Lister<T> lister;
 
     /** Work queue */
-    private BlockingQueue<ResourceChange> workQueue;
+    private BlockingQueue<ResourceChange<T>> workQueue;
 
     public SiteWhereResourceController(KubernetesClient client, SharedInformerFactory informerFactory) {
 	this.client = client;
@@ -64,7 +64,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
 		String key = Cache.metaNamespaceKeyFunc(resource);
 		if (key != null && !key.isEmpty()) {
 		    LOGGER.info(String.format("Add with key %s for %s", key, resource.getMetadata().getName()));
-		    getWorkQueue().add(new ResourceChange(ResourceChangeType.CREATE, key));
+		    getWorkQueue().add(new ResourceChange<T>(ResourceChangeType.CREATE, key, resource));
 		}
 	    }
 
@@ -76,7 +76,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
 		String key = Cache.metaNamespaceKeyFunc(newResource);
 		if (key != null && !key.isEmpty()) {
 		    LOGGER.info(String.format("Update with key %s for %s", key, newResource.getMetadata().getName()));
-		    getWorkQueue().add(new ResourceChange(ResourceChangeType.UPDATE, key));
+		    getWorkQueue().add(new ResourceChange<T>(ResourceChangeType.UPDATE, key, newResource));
 		}
 	    }
 
@@ -85,7 +85,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
 		String key = Cache.metaNamespaceKeyFunc(resource);
 		if (key != null && !key.isEmpty()) {
 		    LOGGER.info(String.format("Delete with key %s for %s", key, resource.getMetadata().getName()));
-		    getWorkQueue().add(new ResourceChange(ResourceChangeType.DELETE, key));
+		    getWorkQueue().add(new ResourceChange<T>(ResourceChangeType.DELETE, key, resource));
 		}
 	    }
 	});
@@ -138,7 +138,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
 		    if (getWorkQueue().isEmpty()) {
 			LOGGER.info("Work Queue is empty");
 		    }
-		    ResourceChange change = getWorkQueue().take();
+		    ResourceChange<T> change = getWorkQueue().take();
 		    String key = change.getKey();
 		    LOGGER.info("Processing key " + key);
 		    if (key == null || key.isEmpty()) {
@@ -149,7 +149,8 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
 		    key = parts.length > 1 ? key : parts[0];
 
 		    // Get the resource's name from key which is in format namespace/name
-		    T resource = getLister().get(key);
+		    boolean isDelete = change.getType() == ResourceChangeType.DELETE;
+		    T resource = isDelete ? change.getReference() : getLister().get(key);
 		    if (resource == null) {
 			LOGGER.error("Resource " + key + " in work queue no longer exists.");
 			return;
@@ -181,7 +182,7 @@ public abstract class SiteWhereResourceController<T extends CustomResource> {
 	return lister;
     }
 
-    protected BlockingQueue<ResourceChange> getWorkQueue() {
+    protected BlockingQueue<ResourceChange<T>> getWorkQueue() {
 	return workQueue;
     }
 }

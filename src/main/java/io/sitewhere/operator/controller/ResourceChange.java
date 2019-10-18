@@ -7,7 +7,7 @@
  */
 package io.sitewhere.operator.controller;
 
-public class ResourceChange {
+public class ResourceChange<T> {
 
     /** Type of change */
     private ResourceChangeType type;
@@ -15,9 +15,13 @@ public class ResourceChange {
     /** Key */
     private String key;
 
-    public ResourceChange(ResourceChangeType type, String key) {
+    /** Resource reference */
+    private T reference;
+
+    public ResourceChange(ResourceChangeType type, String key, T reference) {
 	this.type = type;
 	this.key = key;
+	this.reference = reference;
     }
 
     public ResourceChangeType getType() {
@@ -34,5 +38,13 @@ public class ResourceChange {
 
     public void setKey(String key) {
 	this.key = key;
+    }
+
+    public T getReference() {
+	return reference;
+    }
+
+    public void setReference(T reference) {
+	this.reference = reference;
     }
 }

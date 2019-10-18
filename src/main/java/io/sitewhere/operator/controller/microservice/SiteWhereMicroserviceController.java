@@ -76,7 +76,11 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	LOGGER.info(String.format("Detected %s resource change in microservice %s.", type.name(),
 		microservice.getMetadata().getName()));
 	if (type == ResourceChangeType.CREATE) {
-	    getWorkers().execute(new MicroserviceCreationValidator(type, microservice));
+	    getWorkers().execute(new MicroserviceCreationWorker(type, microservice));
+	} else if (type == ResourceChangeType.UPDATE) {
+	    getWorkers().execute(new MicroserviceUpdateWorker(type, microservice));
+	} else if (type == ResourceChangeType.DELETE) {
+	    getWorkers().execute(new MicroserviceDeleteWorker(type, microservice));
 	}
     }
 
@@ -121,26 +125,6 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     protected String getDeploymentName(SiteWhereMicroservice microservice) {
 	return String.format("%s-%s", microservice.getSpec().getHelm().getReleaseName(),
 		microservice.getSpec().getFunctionalArea());
-    }
-
-    /**
-     * Get service name for a microservice.
-     * 
-     * @param microservice
-     * @return
-     */
-    protected String getServiceName(SiteWhereMicroservice microservice) {
-	return String.format("%s-svc", getDeploymentName(microservice));
-    }
-
-    /**
-     * Get debug service name for a microservice.
-     * 
-     * @param microservice
-     * @return
-     */
-    protected String getDebugServiceName(SiteWhereMicroservice microservice) {
-	return String.format("%s-debug-svc", getDeploymentName(microservice));
     }
 
     /**
@@ -261,26 +245,28 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     }
 
     /**
-     * Verifies an existing deployment or creates a new one for the microservice.
+     * Get deployment responsible for microservice pods.
      * 
      * @param microservice
      * @return
      */
-    protected Deployment verifyOrCreateDeployment(SiteWhereMicroservice microservice) {
+    protected Deployment getDeployment(SiteWhereMicroservice microservice) {
+	String deployName = getDeploymentName(microservice);
+	return getClient().apps().deployments().inNamespace(microservice.getMetadata().getNamespace())
+		.withName(deployName).get();
+    }
+
+    /**
+     * Creates or updates a deployment based on microservice resource configuration.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected Deployment createOrUpdateDeployment(SiteWhereMicroservice microservice) {
 	String deployName = getDeploymentName(microservice);
 
-	// Check for existing deployment.
-	Deployment deployment = getClient().apps().deployments().inNamespace(microservice.getMetadata().getNamespace())
-		.withName(deployName).get();
-	if (deployment != null) {
-	    LOGGER.info(String.format("Found existing deployment at '%s'", deployName));
-	    return deployment;
-	}
-
-	// Build new deployment.
-	DeploymentBuilder dbuilder = new DeploymentBuilder();
-
 	// Build deployment metadata.
+	DeploymentBuilder dbuilder = new DeploymentBuilder();
 	dbuilder.withNewMetadata().withName(deployName).withNamespace(microservice.getMetadata().getNamespace())
 		.addToLabels(deploymentLabels(microservice)).endMetadata();
 
@@ -290,35 +276,123 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		.withTemplate(buildPodTemplate(microservice)).endSpec();
 
 	// Create deployment.
-	deployment = getClient().apps().deployments().create(dbuilder.build());
+	Deployment deployment = getClient().apps().deployments().createOrReplace(dbuilder.build());
 	return deployment;
     }
 
     /**
-     * Verifies an existing service for making debug ports available or creates a
-     * new one.
+     * Delete deployment responsible for microservice pods.
      * 
      * @param microservice
      * @return
      */
-    protected Service verifyOrCreateDebugService(SiteWhereMicroservice microservice) {
-	String debugSvcName = getDebugServiceName(microservice);
-	Service service = getClient().services().inNamespace(microservice.getMetadata().getNamespace())
-		.withName(debugSvcName).get();
-	if (service != null) {
-	    LOGGER.info(String.format("Found existing debug service at '%s'", debugSvcName));
-	    return service;
+    protected Boolean deleteDeployment(SiteWhereMicroservice microservice) {
+	Deployment deployment = getDeployment(microservice);
+	if (deployment != null) {
+	    return getClient().apps().deployments().delete(deployment);
 	}
+	return true;
+    }
 
+    /**
+     * Get service name for a microservice.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected String getServiceName(SiteWhereMicroservice microservice) {
+	return String.format("%s-svc", getDeploymentName(microservice));
+    }
+
+    /**
+     * Get service which exposes microservice pods.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected Service getService(SiteWhereMicroservice microservice) {
+	String svcName = getServiceName(microservice);
+	return getClient().services().inNamespace(microservice.getMetadata().getNamespace()).withName(svcName).get();
+    }
+
+    /**
+     * Creates a service exposing pods (or updates if service exists).
+     * 
+     * @param microservice
+     * @return
+     */
+    protected Service createOrUpdateService(SiteWhereMicroservice microservice) {
+	String svcName = getServiceName(microservice);
+
+	// Create service metadata.
 	ServiceBuilder builder = new ServiceBuilder();
+	builder.withNewMetadata().withName(svcName).withNamespace(microservice.getMetadata().getNamespace())
+		.addToLabels(serviceLabels(microservice)).endMetadata();
+
+	// Create service spec.
+	builder.withNewSpec().withType(microservice.getSpec().getServiceSpec().getType())
+		.withPorts(microservice.getSpec().getServiceSpec().getPorts())
+		.addToSelector(ResourceLabels.LABEL_K8S_NAME, getMicroserviceName(microservice))
+		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName()).endSpec();
+
+	// Create debug service.
+	Service service = getClient().services().create(builder.build());
+	return service;
+    }
+
+    /**
+     * Delete service responsible for exposing pods.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected Boolean deleteService(SiteWhereMicroservice microservice) {
+	Service service = getService(microservice);
+	if (service != null) {
+	    return getClient().services().delete(service);
+	}
+	return true;
+    }
+
+    /**
+     * Get debug service name for a microservice.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected String getDebugServiceName(SiteWhereMicroservice microservice) {
+	return String.format("%s-debug-svc", getDeploymentName(microservice));
+    }
+
+    /**
+     * Get service which exposes debugger ports.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected Service getDebugService(SiteWhereMicroservice microservice) {
+	String debugSvcName = getDebugServiceName(microservice);
+	return getClient().services().inNamespace(microservice.getMetadata().getNamespace()).withName(debugSvcName)
+		.get();
+    }
+
+    /**
+     * Creates a service exposing debug ports (or updates if service exists).
+     * 
+     * @param microservice
+     * @return
+     */
+    protected Service createOrUpdateDebugService(SiteWhereMicroservice microservice) {
+	String debugSvcName = getDebugServiceName(microservice);
 
 	// Create debug service metadata.
+	ServiceBuilder builder = new ServiceBuilder();
 	builder.withNewMetadata().withName(debugSvcName).withNamespace(microservice.getMetadata().getNamespace())
 		.addToLabels(serviceLabels(microservice)).endMetadata();
 
 	// Create debug service spec.
-	builder.withNewSpec().withType("LoadBalancer").addNewPort().withName("tcp-jdwp")
-		.withPort(microservice.getSpec().getDebug().getJdwpPort())
+	builder.withNewSpec().withType(microservice.getSpec().getServiceSpec().getType()).addNewPort()
+		.withName("tcp-jdwp").withPort(microservice.getSpec().getDebug().getJdwpPort())
 		.withTargetPort(
 			new IntOrStringBuilder().withIntVal(microservice.getSpec().getDebug().getJdwpPort()).build())
 		.withProtocol("TCP").endPort().addNewPort().withName("tcp-jmx")
@@ -330,22 +404,37 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName()).endSpec();
 
 	// Create debug service.
-	service = getClient().services().create(builder.build());
+	Service service = getClient().services().create(builder.build());
 	return service;
     }
 
     /**
-     * Validates k8s resources associated with new SiteWhere microservice.
+     * Delete service responsible for exposing debug ports.
+     * 
+     * @param microservice
+     * @return
      */
-    protected class MicroserviceCreationValidator extends MicroserviceWorkerRunnable {
+    protected Boolean deleteDebugService(SiteWhereMicroservice microservice) {
+	Service service = getDebugService(microservice);
+	if (service != null) {
+	    return getClient().services().delete(service);
+	}
+	return true;
+    }
 
-	public MicroserviceCreationValidator(ResourceChangeType type, SiteWhereMicroservice microservice) {
+    /**
+     * Creates k8s resources associated with new SiteWhere microservice.
+     */
+    protected class MicroserviceCreationWorker extends MicroserviceWorkerRunnable {
+
+	public MicroserviceCreationWorker(ResourceChangeType type, SiteWhereMicroservice microservice) {
 	    super(type, microservice);
 	}
 
 	@Override
 	public void run() {
-	    LOGGER.info("Validating created SiteWhereMicroservice.");
+	    LOGGER.info("Handling microservice creation.");
+	    String name = getMicroserviceName(getMicroservice());
 
 	    // Validate that Helm metadata is provided.
 	    if (getMicroservice().getSpec() == null || getMicroservice().getSpec().getHelm() == null) {
@@ -353,13 +442,120 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		return;
 	    }
 
-	    Deployment deployment = verifyOrCreateDeployment(getMicroservice());
-	    LOGGER.info(String.format("Created deployment:\n\n%s", deployment.toString()));
+	    Deployment deployment = getDeployment(getMicroservice());
+	    if (deployment == null) {
+		deployment = createOrUpdateDeployment(getMicroservice());
+		LOGGER.info(String.format("Created deployment for microservice %s", name));
+		if (LOGGER.isDebugEnabled()) {
+		    LOGGER.debug(String.format("Created deployment:\n\n%s", deployment.toString()));
+		}
+	    }
+
+	    Service service = getService(getMicroservice());
+	    if (service == null) {
+		service = createOrUpdateService(getMicroservice());
+		LOGGER.info(String.format("Created service for microservice %s", name));
+		if (LOGGER.isDebugEnabled()) {
+		    LOGGER.debug(String.format("Created service:\n\n%s", service.toString()));
+		}
+	    }
 
 	    // Create debug service if debug enabled.
 	    if (!getMicroservice().getSpec().getDebug().isEnabled()) {
-		verifyOrCreateDebugService(getMicroservice());
+		Service debugSvc = getDebugService(getMicroservice());
+		if (debugSvc == null) {
+		    debugSvc = createOrUpdateDebugService(getMicroservice());
+		    LOGGER.info(String.format("Created debug service for microservice %s", name));
+		    if (LOGGER.isDebugEnabled()) {
+			LOGGER.debug(String.format("Created debug service:\n\n%s", debugSvc.toString()));
+		    }
+		}
+	    } else {
+		deleteDebugService(getMicroservice());
+		LOGGER.info(String.format("Deleted debug service for microservice %s", name));
 	    }
+	}
+    }
+
+    /**
+     * Updates k8s resources associated with new SiteWhere microservice.
+     */
+    protected class MicroserviceUpdateWorker extends MicroserviceWorkerRunnable {
+
+	public MicroserviceUpdateWorker(ResourceChangeType type, SiteWhereMicroservice microservice) {
+	    super(type, microservice);
+	}
+
+	@Override
+	public void run() {
+	    LOGGER.info("Handling microservice update.");
+	    String name = getMicroserviceName(getMicroservice());
+
+	    // Validate that Helm metadata is provided.
+	    if (getMicroservice().getSpec() == null || getMicroservice().getSpec().getHelm() == null) {
+		LOGGER.error("Missing spec or Helm metadata. Can not add microservice resources.");
+		return;
+	    }
+
+	    // Update an existing deployment (or create if necessary).
+	    Deployment deployment = createOrUpdateDeployment(getMicroservice());
+	    LOGGER.info(String.format("Updated deployment for microservice %s", name));
+	    if (LOGGER.isDebugEnabled()) {
+		LOGGER.debug(String.format("Updated deployment:\n\n%s", deployment.toString()));
+	    }
+
+	    // Update an existing service (or create if necessary)
+	    Service service = createOrUpdateService(getMicroservice());
+	    LOGGER.info(String.format("Updated service for microservice %s", name));
+	    if (LOGGER.isDebugEnabled()) {
+		LOGGER.debug(String.format("Updated service:\n\n%s", service.toString()));
+	    }
+
+	    // Create debug service if debug enabled.
+	    if (!getMicroservice().getSpec().getDebug().isEnabled()) {
+		Service debugSvc = createOrUpdateDebugService(getMicroservice());
+		LOGGER.info(String.format("Updated debug service for microservice %s", name));
+		if (LOGGER.isDebugEnabled()) {
+		    LOGGER.debug(String.format("Updated debug service:\n\n%s", debugSvc.toString()));
+		}
+	    } else {
+		deleteDebugService(getMicroservice());
+		LOGGER.info(String.format("Deleted debug service for microservice %s", name));
+	    }
+	}
+    }
+
+    /**
+     * Deletes k8s resources associated with new SiteWhere microservice.
+     */
+    protected class MicroserviceDeleteWorker extends MicroserviceWorkerRunnable {
+
+	public MicroserviceDeleteWorker(ResourceChangeType type, SiteWhereMicroservice microservice) {
+	    super(type, microservice);
+	}
+
+	@Override
+	public void run() {
+	    LOGGER.info("Handling microservice deletion.");
+	    String name = getMicroserviceName(getMicroservice());
+
+	    // Validate that Helm metadata is provided.
+	    if (getMicroservice().getSpec() == null || getMicroservice().getSpec().getHelm() == null) {
+		LOGGER.error("Missing spec or Helm metadata. Can not add microservice resources.");
+		return;
+	    }
+
+	    // Delete deployment.
+	    deleteDeployment(getMicroservice());
+	    LOGGER.info(String.format("Deleted deployment for microservice %s", name));
+
+	    // Delete service.
+	    deleteService(getMicroservice());
+	    LOGGER.info(String.format("Deleted service for microservice %s", name));
+
+	    // Delete debug service.
+	    deleteDebugService(getMicroservice());
+	    LOGGER.info(String.format("Deleted debug service for microservice %s", name));
 	}
     }
 
