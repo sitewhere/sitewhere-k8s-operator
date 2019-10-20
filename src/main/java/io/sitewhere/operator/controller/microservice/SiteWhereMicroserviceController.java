@@ -10,6 +10,7 @@ package io.sitewhere.operator.controller.microservice;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -17,6 +18,8 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.fabric8.kubernetes.api.model.ContainerPort;
+import io.fabric8.kubernetes.api.model.ContainerPortBuilder;
 import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.api.model.EventBuilder;
 import io.fabric8.kubernetes.api.model.IntOrStringBuilder;
@@ -104,6 +107,19 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		.endInvolvedObject().withFirstTimestamp(timestamp).withLastTimestamp(timestamp).withNewSource()
 		.withComponent("sitewhere-operator").endSource().build();
 	getClient().events().create(event);
+    }
+
+    /**
+     * Indicates whether microservice debugging is enabled.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected boolean isDebugEnabled(SiteWhereMicroservice microservice) {
+	if (microservice.getSpec().getDebug() != null && microservice.getSpec().getDebug().isEnabled()) {
+	    return true;
+	}
+	return false;
     }
 
     /**
@@ -231,11 +247,21 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	builder.withNewMetadata().addToLabels(podLabels(microservice)).addToAnnotations(podAnnotations(microservice))
 		.endMetadata();
 
+	// Add debug ports if debug is enabled.
+	List<ContainerPort> ports = microservice.getSpec().getPodSpec().getPorts();
+	if (isDebugEnabled(microservice)) {
+	    ContainerPort jwdp = new ContainerPortBuilder()
+		    .withContainerPort(microservice.getSpec().getDebug().getJdwpPort()).build();
+	    ports.add(jwdp);
+	    ContainerPort jmx = new ContainerPortBuilder()
+		    .withContainerPort(microservice.getSpec().getDebug().getJmxPort()).build();
+	    ports.add(jmx);
+	}
+
 	// Create pod spec.
 	builder.withNewSpec().addNewContainer().withName(getMicroserviceName(microservice))
 		.withImage(buildPodImageName(microservice))
-		.withImagePullPolicy(microservice.getSpec().getPodSpec().getImagePullPolicy())
-		.withPorts(microservice.getSpec().getPodSpec().getPorts())
+		.withImagePullPolicy(microservice.getSpec().getPodSpec().getImagePullPolicy()).withPorts(ports)
 		.withEnv(microservice.getSpec().getPodSpec().getEnv())
 		.withResources(microservice.getSpec().getPodSpec().getResources())
 		.withReadinessProbe(microservice.getSpec().getPodSpec().getReadinessProbe())

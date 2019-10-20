@@ -23,6 +23,7 @@ import io.fabric8.kubernetes.client.NamespacedKubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import io.sitewhere.operator.controller.instance.SiteWhereInstanceController;
 import io.sitewhere.operator.controller.microservice.SiteWhereMicroserviceController;
+import io.sitewhere.operator.controller.tenant.SiteWhereTenantController;
 
 /**
  * Main class for operator.
@@ -37,7 +38,7 @@ public class SiteWhereOperator {
 
     public static void main(String[] args) {
 	// Thread pool used for controller loops.
-	ExecutorService loopsPool = Executors.newFixedThreadPool(2, new EventLoopThreadFactory());
+	ExecutorService loopsPool = Executors.newFixedThreadPool(3, new EventLoopThreadFactory());
 
 	// Catch shutdown signal.
 	addShutdownHook();
@@ -55,6 +56,7 @@ public class SiteWhereOperator {
 	    SiteWhereInstanceController instanceController = new SiteWhereInstanceController(client, informerFactory);
 	    SiteWhereMicroserviceController microserviceController = new SiteWhereMicroserviceController(client,
 		    informerFactory);
+	    SiteWhereTenantController tenantController = new SiteWhereTenantController(client, informerFactory);
 
 	    // Start informers.
 	    informerFactory.startAllRegisteredInformers();
@@ -62,6 +64,7 @@ public class SiteWhereOperator {
 	    // Start event loops.
 	    loopsPool.execute(instanceController.createEventLoop());
 	    loopsPool.execute(microserviceController.createEventLoop());
+	    loopsPool.execute(tenantController.createEventLoop());
 
 	    SHUTDOWN.await();
 	} catch (InterruptedException e) {

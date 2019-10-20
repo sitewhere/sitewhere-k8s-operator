@@ -13,8 +13,6 @@ apply plugin: 'distribution'
 
 ext['docker.base.image'] = 'openjdk:8-jre-alpine'
 ext['docker.maintainer'] = 'admin@sitewhere.com'
-
-ext['fabric8.version'] = '4.6.0'
     
 allprojects {
     group = 'com.sitewhere'
@@ -68,7 +66,7 @@ allprojects {
     
 	// Library dependencies.
     dependencies {
-		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: "0.0.3"
+		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: "0.0.4"
 	
     	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.1'
 		

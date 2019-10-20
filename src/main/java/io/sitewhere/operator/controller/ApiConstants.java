@@ -27,6 +27,9 @@ public class ApiConstants {
     /** SiteWhereMicroservice CRD plural */
     public static final String SITEWHERE_MICROSERVICE_CRD_PLURAL = "sitewheremicroservices";
 
+    /** SiteWhereTenant CRD plural */
+    public static final String SITEWHERE_TENANT_CRD_PLURAL = "sitewheretenants";
+
     /** SiteWhereInstance CRD name */
     public static final String SITEWHERE_INSTANCE_CRD_NAME = SITEWHERE_INSTANCE_CRD_PLURAL + "." + SITEWHERE_API_GROUP;
 
@@ -36,4 +39,7 @@ public class ApiConstants {
     /** SiteWhereMicroservice CRD name */
     public static final String SITEWHERE_MICROSERVICE_CRD_NAME = SITEWHERE_MICROSERVICE_CRD_PLURAL + "."
 	    + SITEWHERE_API_GROUP;
+
+    /** SiteWhereTenant CRD name */
+    public static final String SITEWHERE_TENANT_CRD_NAME = SITEWHERE_TENANT_CRD_PLURAL + "." + SITEWHERE_API_GROUP;
 }
