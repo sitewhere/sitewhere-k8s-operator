@@ -1,7 +1,7 @@
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: sitewhereinstances.sitewhere.io
+  name: instances.sitewhere.io
   labels:
     app: sitewhere
 spec:
@@ -9,8 +9,8 @@ spec:
   names:
     kind: SiteWhereInstance
     listKind: SiteWhereInstanceList
-    plural: sitewhereinstances
-    singular: sitewhereinstance
+    plural: instances
+    singular: instance
     shortNames:
     - swi
     categories:
@@ -40,16 +40,16 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: instanceconfigurationtemplates.sitewhere.io
+  name: instanceconfigurations.templates.sitewhere.io
   labels:
     app: sitewhere
 spec:
-  group: sitewhere.io
+  group: templates.sitewhere.io
   names:
     kind: InstanceConfigurationTemplate
     listKind: InstanceConfigurationTemplateList
-    plural: instanceconfigurationtemplates
-    singular: instanceconfigurationtemplate
+    plural: instanceconfigurations
+    singular: instanceconfiguration
     shortNames:
     - ict
     categories:
@@ -75,16 +75,16 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: instancedatasettemplates.sitewhere.io
+  name: instancedatasets.templates.sitewhere.io
   labels:
     app: sitewhere
 spec:
-  group: sitewhere.io
+  group: templates.sitewhere.io
   names:
     kind: InstanceDatasetTemplate
     listKind: InstanceDatasetTemplateList
-    plural: instancedatasettemplates
-    singular: instancedatasettemplate
+    plural: instancedatasets
+    singular: instancedataset
     shortNames:
     - idt
     categories:
@@ -99,7 +99,7 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: sitewheremicroservices.sitewhere.io
+  name: microservices.sitewhere.io
   labels:
     app: sitewhere
 spec:
@@ -107,8 +107,8 @@ spec:
   names:
     kind: SiteWhereMicroservice
     listKind: SiteWhereMicroserviceList
-    plural: sitewheremicroservices
-    singular: sitewheremicroservice
+    plural: microservices
+    singular: microservice
     shortNames:
     - swm
     categories:
@@ -123,7 +123,7 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: sitewheretenants.sitewhere.io
+  name: tenants.sitewhere.io
   labels:
     app: sitewhere
 spec:
@@ -131,8 +131,8 @@ spec:
   names:
     kind: SiteWhereTenant
     listKind: SiteWhereTenantList
-    plural: sitewheretenants
-    singular: sitewheretenant
+    plural: tenants
+    singular: tenant
     shortNames:
     - swt
     categories:
@@ -147,7 +147,7 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: sitewheretenantengines.sitewhere.io
+  name: tenantengines.sitewhere.io
   labels:
     app: sitewhere
 spec:
@@ -155,8 +155,8 @@ spec:
   names:
     kind: SiteWhereTenantEngine
     listKind: SiteWhereTenantEngineList
-    plural: sitewheretenantengines
-    singular: sitewheretenantengine
+    plural: tenantengines
+    singular: tenantengine
     shortNames:
     - swte
     categories:
@@ -171,22 +171,22 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: tenantconfigurationtemplates.sitewhere.io
+  name: tenantconfigurations.templates.sitewhere.io
   labels:
     app: sitewhere
 spec:
-  group: sitewhere.io
+  group: templates.sitewhere.io
   names:
     kind: TenantConfigurationTemplate
     listKind: TenantConfigurationTemplateList
-    plural: tenantconfigurationtemplates
-    singular: tenantconfigurationtemplate
+    plural: tenantconfigurations
+    singular: tenantconfiguration
     shortNames:
     - tct
     categories:
     - sitewhere-io
     - core-sitewhere-io
-  scope: Namespaced
+  scope: Cluster
   versions:
     - name: v1alpha3
       served: true
@@ -195,22 +195,22 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: tenantengineconfigurationtemplates.sitewhere.io
+  name: tenantengineconfigurations.templates.sitewhere.io
   labels:
     app: sitewhere
 spec:
-  group: sitewhere.io
+  group: templates.sitewhere.io
   names:
     kind: TenantEngineConfigurationTemplate
     listKind: TenantEngineConfigurationTemplateList
-    plural: tenantengineconfigurationtemplates
-    singular: tenantengineconfigurationtemplate
+    plural: tenantengineconfigurations
+    singular: tenantengineconfiguration
     shortNames:
     - tect
     categories:
     - sitewhere-io
     - core-sitewhere-io
-  scope: Namespaced
+  scope: Cluster
   versions:
     - name: v1alpha3
       served: true
@@ -219,22 +219,22 @@ spec:
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
 metadata:
-  name: tenantenginedatasettemplates.sitewhere.io
+  name: tenantenginedatasets.templates.sitewhere.io
   labels:
     app: sitewhere
 spec:
-  group: sitewhere.io
+  group: templates.sitewhere.io
   names:
     kind: TenantEngineDatasetTemplate
     listKind: TenantEngineDatasetTemplateList
-    plural: tenantenginedatasettemplates
-    singular: tenantenginedatasettemplate
+    plural: tenantenginedatasets
+    singular: tenantenginedataset
     shortNames:
     - tedt
     categories:
     - sitewhere-io
     - core-sitewhere-io
-  scope: Namespaced
+  scope: Cluster
   versions:
     - name: v1alpha3
       served: true

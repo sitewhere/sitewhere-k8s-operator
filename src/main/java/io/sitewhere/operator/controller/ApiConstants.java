@@ -18,23 +18,38 @@ public class ApiConstants {
     /** SiteWhere CRD group */
     public static final String SITEWHERE_API_GROUP = "sitewhere.io";
 
+    /** SiteWhere templates CRD group */
+    public static final String SITEWHERE_TEMPLATES_API_GROUP = "templates.sitewhere.io";
+
     /** SiteWhereInstance CRD plural */
-    public static final String SITEWHERE_INSTANCE_CRD_PLURAL = "sitewhereinstances";
+    public static final String SITEWHERE_INSTANCE_CRD_PLURAL = "instances";
 
     /** InstanceConfigurationTemplate CRD plural */
-    public static final String SITEWHERE_ICT_CRD_PLURAL = "instanceconfigurationtemplates";
+    public static final String SITEWHERE_ICT_CRD_PLURAL = "instanceconfigurations";
 
     /** SiteWhereMicroservice CRD plural */
-    public static final String SITEWHERE_MICROSERVICE_CRD_PLURAL = "sitewheremicroservices";
+    public static final String SITEWHERE_MICROSERVICE_CRD_PLURAL = "microservices";
 
     /** SiteWhereTenant CRD plural */
-    public static final String SITEWHERE_TENANT_CRD_PLURAL = "sitewheretenants";
+    public static final String SITEWHERE_TENANT_CRD_PLURAL = "tenants";
+
+    /** TenantConfigurationTemplate CRD plural */
+    public static final String SITEWHERE_TCT_CRD_PLURAL = "tenantconfigurations";
+
+    /** SiteWhereTenantEngine CRD plural */
+    public static final String SITEWHERE_TENANT_ENGINE_CRD_PLURAL = "tenantengines";
+
+    /** TenantEngineConfigurationTemplate CRD plural */
+    public static final String SITEWHERE_TECT_CRD_PLURAL = "tenantengineconfigurations";
+
+    /** TenantEngineDatasetTemplate CRD plural */
+    public static final String SITEWHERE_TEDT_CRD_PLURAL = "tenantenginedatasets";
 
     /** SiteWhereInstance CRD name */
     public static final String SITEWHERE_INSTANCE_CRD_NAME = SITEWHERE_INSTANCE_CRD_PLURAL + "." + SITEWHERE_API_GROUP;
 
     /** InstanceConfigurationTemplate CRD name */
-    public static final String SITEWHERE_ICT_CRD_NAME = SITEWHERE_ICT_CRD_PLURAL + "." + SITEWHERE_API_GROUP;
+    public static final String SITEWHERE_ICT_CRD_NAME = SITEWHERE_ICT_CRD_PLURAL + "." + SITEWHERE_TEMPLATES_API_GROUP;
 
     /** SiteWhereMicroservice CRD name */
     public static final String SITEWHERE_MICROSERVICE_CRD_NAME = SITEWHERE_MICROSERVICE_CRD_PLURAL + "."
@@ -42,4 +57,19 @@ public class ApiConstants {
 
     /** SiteWhereTenant CRD name */
     public static final String SITEWHERE_TENANT_CRD_NAME = SITEWHERE_TENANT_CRD_PLURAL + "." + SITEWHERE_API_GROUP;
+
+    /** TenantConfigurationTemplate CRD name */
+    public static final String SITEWHERE_TCT_CRD_NAME = SITEWHERE_TCT_CRD_PLURAL + "." + SITEWHERE_TEMPLATES_API_GROUP;
+
+    /** SiteWhereTenantEngine CRD name */
+    public static final String SITEWHERE_TENANT_ENGINE_CRD_NAME = SITEWHERE_TENANT_ENGINE_CRD_PLURAL + "."
+	    + SITEWHERE_API_GROUP;
+
+    /** TenantEngineConfigurationTemplate CRD name */
+    public static final String SITEWHERE_TECT_CRD_NAME = SITEWHERE_TECT_CRD_PLURAL + "."
+	    + SITEWHERE_TEMPLATES_API_GROUP;
+
+    /** TenantEngineDatasetTemplate CRD name */
+    public static final String SITEWHERE_TEDT_CRD_NAME = SITEWHERE_TEDT_CRD_PLURAL + "."
+	    + SITEWHERE_TEMPLATES_API_GROUP;
 }

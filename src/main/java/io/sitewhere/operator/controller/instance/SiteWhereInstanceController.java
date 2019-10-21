@@ -19,18 +19,13 @@ import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.api.model.EventBuilder;
 import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.NamespaceBuilder;
-import io.fabric8.kubernetes.api.model.apiextensions.CustomResourceDefinition;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
-import io.sitewhere.k8s.crd.instance.DoneableSiteWhereInstance;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstanceList;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstanceStatus;
-import io.sitewhere.k8s.crd.instance.configuration.DoneableInstanceConfigurationTemplate;
 import io.sitewhere.k8s.crd.instance.configuration.InstanceConfigurationTemplate;
-import io.sitewhere.k8s.crd.instance.configuration.InstanceConfigurationTemplateList;
-import io.sitewhere.operator.controller.ApiConstants;
 import io.sitewhere.operator.controller.ResourceChangeType;
 import io.sitewhere.operator.controller.ResourceContexts;
 import io.sitewhere.operator.controller.ResourceLabels;
@@ -104,21 +99,23 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
     }
 
     /**
-     * Resolve an instance configuration template based on name in spec.
+     * Verify that the instance configuration template referenced by an instance
+     * exists.
      * 
      * @param instance
      * @return
      */
-    protected InstanceConfigurationTemplate resolveInstanceConfigurationTemplate(SiteWhereInstance instance) {
-	CustomResourceDefinition crd = getClient().customResourceDefinitions()
-		.withName(ApiConstants.SITEWHERE_ICT_CRD_NAME).get();
-	if (LOGGER.isDebugEnabled()) {
-	    LOGGER.debug(String.format("Found CRD for instance configuration template.\n\n%s\n", crd.toString()));
-	}
-	return getClient()
-		.customResources(crd, InstanceConfigurationTemplate.class, InstanceConfigurationTemplateList.class,
-			DoneableInstanceConfigurationTemplate.class)
+    protected InstanceConfigurationTemplate verifyInstanceConfigurationTemplate(SiteWhereInstance instance) {
+	InstanceConfigurationTemplate ict = getInstanceConfigurationTemplates()
 		.withName(instance.getSpec().getConfigurationTemplate()).get();
+	if (ict == null) {
+	    String message = String.format("Instance template '%s' was not found.",
+		    instance.getSpec().getConfigurationTemplate());
+	    LOGGER.warn(message);
+	    throw new RuntimeException(message);
+	}
+	LOGGER.info(String.format("Instance template '%s' verified.", instance.getSpec().getConfigurationTemplate()));
+	return ict;
     }
 
     /**
@@ -140,13 +137,7 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
 	boolean initialWebStatus = instance.getStatus().isWebConfigured();
 
 	// Verify that instance configuration template exists.
-	InstanceConfigurationTemplate ict = resolveInstanceConfigurationTemplate(instance);
-	if (ict == null) {
-	    LOGGER.info(String.format("Instance template '%s' was not found.",
-		    instance.getSpec().getConfigurationTemplate()));
-	    return null;
-	}
-	LOGGER.info(String.format("Instance template '%s' verified.", instance.getSpec().getConfigurationTemplate()));
+	InstanceConfigurationTemplate ict = verifyInstanceConfigurationTemplate(instance);
 
 	// Copy instance configuration from template if not already set.
 	boolean hadInstanceConfiguration = instance.getSpec().getInstanceConfiguration() != null;
@@ -172,12 +163,7 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
 	// Look up instance and make updates.
 	if (!hadInstanceConfiguration || !hadWebConfiguration || instanceStatusUpdated || webStatusUpdated) {
 	    LOGGER.info("Saving instance specification/status updates.");
-	    CustomResourceDefinition crd = getClient().customResourceDefinitions()
-		    .withName(ApiConstants.SITEWHERE_INSTANCE_CRD_NAME).get();
-	    return getClient()
-		    .customResources(crd, SiteWhereInstance.class, SiteWhereInstanceList.class,
-			    DoneableSiteWhereInstance.class)
-		    .withName(instance.getMetadata().getName()).createOrReplace(instance);
+	    return getInstances().withName(instance.getMetadata().getName()).createOrReplace(instance);
 	} else {
 	    LOGGER.info("Leaving existing instance configuration settings.");
 	    return instance;

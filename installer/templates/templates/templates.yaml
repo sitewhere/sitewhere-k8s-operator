@@ -1,1 +1,34 @@
 {{ .Files.Get "files/ict-default.yaml" }}
+---
+{{ .Files.Get "files/tct-mongodb.yaml" }}
+---
+{{ .Files.Get "files/tect-default-asset-management.yaml" }}
+---
+{{ .Files.Get "files/tect-default-batch-operations.yaml" }}
+---
+{{ .Files.Get "files/tect-default-command-delivery.yaml" }}
+---
+{{ .Files.Get "files/tect-default-device-management.yaml" }}
+---
+{{ .Files.Get "files/tect-default-device-registration.yaml" }}
+---
+{{ .Files.Get "files/tect-default-device-state.yaml" }}
+---
+{{ .Files.Get "files/tect-default-event-management.yaml" }}
+---
+{{ .Files.Get "files/tect-default-event-search.yaml" }}
+---
+{{ .Files.Get "files/tect-default-event-sources.yaml" }}
+---
+{{ .Files.Get "files/tect-default-inbound-processing.yaml" }}
+---
+{{ .Files.Get "files/tect-default-label-generation.yaml" }}
+---
+{{ .Files.Get "files/tect-default-outbound-connectors.yaml" }}
+---
+{{ .Files.Get "files/tect-default-rule-processing.yaml" }}
+---
+{{ .Files.Get "files/tect-default-schedule-management.yaml" }}
+---
+{{ .Files.Get "files/tect-default-streaming-media.yaml" }}
+

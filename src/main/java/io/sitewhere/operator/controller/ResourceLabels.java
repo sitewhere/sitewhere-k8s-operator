@@ -18,6 +18,15 @@ public class ResourceLabels {
     /** Label for SiteWhere instance name */
     public static final String LABEL_SITEWHERE_INSTANCE = "sitewhere.io/instance";
 
+    /** Label for SiteWhere tenant name */
+    public static final String LABEL_SITEWHERE_TENANT = "sitewhere.io/tenant";
+
+    /** Label for SiteWhere microservice name */
+    public static final String LABEL_SITEWHERE_MICROSERVICE = "sitewhere.io/microservice";
+
+    /** Label for SiteWhere functional area name */
+    public static final String LABEL_SITEWHERE_FUNCTIONAL_AREA = "sitewhere.io/functional-area";
+
     /** Label for Kubernetes name */
     public static final String LABEL_K8S_NAME = "app.kubernetes.io/name";
 
