@@ -134,34 +134,24 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
 	    instance.setStatus(new SiteWhereInstanceStatus());
 	}
 	boolean initialInstanceStatus = instance.getStatus().isInstanceConfigured();
-	boolean initialWebStatus = instance.getStatus().isWebConfigured();
 
 	// Verify that instance configuration template exists.
 	InstanceConfigurationTemplate ict = verifyInstanceConfigurationTemplate(instance);
 
-	// Copy instance configuration from template if not already set.
-	boolean hadInstanceConfiguration = instance.getSpec().getInstanceConfiguration() != null;
-	if (!hadInstanceConfiguration) {
+	// Copy configuration from template if not already set.
+	boolean hadConfiguration = instance.getSpec().getConfiguration() != null;
+	if (!hadConfiguration) {
 	    LOGGER.info("Instance configuration not set. Copying from template.");
-	    instance.getSpec().setInstanceConfiguration(ict.getSpec().getInstanceConfiguration());
-	}
-
-	// Copy web configuration from template if not already set.
-	boolean hadWebConfiguration = instance.getSpec().getWebConfiguration() != null;
-	if (!hadWebConfiguration) {
-	    LOGGER.info("Web configuration not set. Copying from template.");
-	    instance.getSpec().setWebConfiguration(ict.getSpec().getWebConfiguration());
+	    instance.getSpec().setConfiguration(ict.getSpec().getConfiguration());
 	}
 
 	// Update status values based on current
-	instance.getStatus().setInstanceConfigured(instance.getSpec().getInstanceConfiguration() != null);
-	instance.getStatus().setWebConfigured(instance.getSpec().getWebConfiguration() != null);
+	instance.getStatus().setInstanceConfigured(instance.getSpec().getConfiguration() != null);
 
 	boolean instanceStatusUpdated = initialInstanceStatus != instance.getStatus().isInstanceConfigured();
-	boolean webStatusUpdated = initialWebStatus != instance.getStatus().isWebConfigured();
 
 	// Look up instance and make updates.
-	if (!hadInstanceConfiguration || !hadWebConfiguration || instanceStatusUpdated || webStatusUpdated) {
+	if (!hadConfiguration || instanceStatusUpdated) {
 	    LOGGER.info("Saving instance specification/status updates.");
 	    return getSitewhereClient().getInstances().withName(instance.getMetadata().getName())
 		    .createOrReplace(instance);
