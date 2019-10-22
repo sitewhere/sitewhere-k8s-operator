@@ -22,13 +22,13 @@ import io.fabric8.kubernetes.api.model.NamespaceBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
+import io.sitewhere.k8s.crd.ResourceContexts;
+import io.sitewhere.k8s.crd.ResourceLabels;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstanceList;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstanceStatus;
 import io.sitewhere.k8s.crd.instance.configuration.InstanceConfigurationTemplate;
 import io.sitewhere.operator.controller.ResourceChangeType;
-import io.sitewhere.operator.controller.ResourceContexts;
-import io.sitewhere.operator.controller.ResourceLabels;
 import io.sitewhere.operator.controller.SiteWhereResourceController;
 
 /**
@@ -106,7 +106,7 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
      * @return
      */
     protected InstanceConfigurationTemplate verifyInstanceConfigurationTemplate(SiteWhereInstance instance) {
-	InstanceConfigurationTemplate ict = getInstanceConfigurationTemplates()
+	InstanceConfigurationTemplate ict = getSitewhereClient().getInstanceConfigurationTemplates()
 		.withName(instance.getSpec().getConfigurationTemplate()).get();
 	if (ict == null) {
 	    String message = String.format("Instance template '%s' was not found.",
@@ -163,7 +163,8 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
 	// Look up instance and make updates.
 	if (!hadInstanceConfiguration || !hadWebConfiguration || instanceStatusUpdated || webStatusUpdated) {
 	    LOGGER.info("Saving instance specification/status updates.");
-	    return getInstances().withName(instance.getMetadata().getName()).createOrReplace(instance);
+	    return getSitewhereClient().getInstances().withName(instance.getMetadata().getName())
+		    .createOrReplace(instance);
 	} else {
 	    LOGGER.info("Leaving existing instance configuration settings.");
 	    return instance;

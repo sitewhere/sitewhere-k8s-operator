@@ -20,6 +20,8 @@ import com.google.common.base.CaseFormat;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
+import io.sitewhere.k8s.crd.ResourceContexts;
+import io.sitewhere.k8s.crd.ResourceLabels;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroserviceList;
 import io.sitewhere.k8s.crd.tenant.SiteWhereTenant;
@@ -30,8 +32,6 @@ import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineList;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineSpec;
 import io.sitewhere.k8s.crd.tenant.engine.configuration.TenantEngineConfigurationTemplate;
 import io.sitewhere.operator.controller.ResourceChangeType;
-import io.sitewhere.operator.controller.ResourceContexts;
-import io.sitewhere.operator.controller.ResourceLabels;
 import io.sitewhere.operator.controller.SiteWhereResourceController;
 
 /**
@@ -67,7 +67,7 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
      * @return
      */
     protected SiteWhereMicroserviceList getAllMicroservices(SiteWhereTenant tenant) {
-	return getMicroservices().inNamespace(tenant.getMetadata().getNamespace()).list();
+	return getSitewhereClient().getMicroservices().inNamespace(tenant.getMetadata().getNamespace()).list();
     }
 
     /**
@@ -77,7 +77,8 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
      * @return
      */
     protected Map<String, SiteWhereTenantEngine> getTenantEnginesForTenantByMicroservice(SiteWhereTenant tenant) {
-	SiteWhereTenantEngineList list = getTenantEngines().inNamespace(tenant.getMetadata().getNamespace())
+	SiteWhereTenantEngineList list = getSitewhereClient().getTenantEngines()
+		.inNamespace(tenant.getMetadata().getNamespace())
 		.withLabel(ResourceLabels.LABEL_SITEWHERE_TENANT, tenant.getMetadata().getName()).list();
 	Map<String, SiteWhereTenantEngine> byMicroservice = new HashMap<>();
 	for (SiteWhereTenantEngine engine : list.getItems()) {
@@ -99,7 +100,7 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
      */
     protected TenantEngineConfigurationTemplate getTenantEngineConfigurationTemplate(SiteWhereTenant tenant,
 	    SiteWhereMicroservice microservice) {
-	TenantConfigurationTemplate tenantTemplate = getTenantConfigurationTemplates()
+	TenantConfigurationTemplate tenantTemplate = getSitewhereClient().getTenantConfigurationTemplates()
 		.withName(tenant.getSpec().getConfigurationTemplate()).get();
 	if (tenantTemplate == null) {
 	    String message = String.format("Tenant references non-existent configuration template '%s'.",
@@ -116,7 +117,7 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
 	    return null;
 	}
 
-	return getTenantEngineConfigurationTemplates().withName(tecTemplateName).get();
+	return getSitewhereClient().getTenantEngineConfigurationTemplates().withName(tecTemplateName).get();
     }
 
     /**
@@ -149,7 +150,7 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
 	spec.setConfiguration(tecTemplate.getSpec().getConfiguration());
 	engine.setSpec(spec);
 
-	getTenantEngines().withName(tenantEngineName).createOrReplace(engine);
+	getSitewhereClient().getTenantEngines().withName(tenantEngineName).createOrReplace(engine);
 	LOGGER.info(String.format("Created new tenant engine for tenant `%s` microservice `%s`",
 		tenant.getMetadata().getName(), microservice.getMetadata().getName()));
     }
@@ -182,11 +183,12 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
      * @return
      */
     protected boolean deleteTenantEngines(SiteWhereTenant tenant) {
-	SiteWhereTenantEngineList list = getTenantEngines().inNamespace(tenant.getMetadata().getNamespace())
+	SiteWhereTenantEngineList list = getSitewhereClient().getTenantEngines()
+		.inNamespace(tenant.getMetadata().getNamespace())
 		.withLabel(ResourceLabels.LABEL_SITEWHERE_TENANT, tenant.getMetadata().getName()).list();
 	LOGGER.info(String.format("Deleting %s tenant engines for tenant '%s'", String.valueOf(list.getItems().size()),
 		tenant.getMetadata().getName()));
-	return getTenantEngines().inNamespace(tenant.getMetadata().getNamespace())
+	return getSitewhereClient().getTenantEngines().inNamespace(tenant.getMetadata().getNamespace())
 		.withLabel(ResourceLabels.LABEL_SITEWHERE_TENANT, tenant.getMetadata().getName()).delete();
     }
 

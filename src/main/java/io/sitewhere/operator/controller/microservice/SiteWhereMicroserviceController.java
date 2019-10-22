@@ -32,15 +32,15 @@ import io.fabric8.kubernetes.api.model.apps.DeploymentBuilder;
 import io.fabric8.kubernetes.client.KubernetesClient;
 import io.fabric8.kubernetes.client.informers.SharedIndexInformer;
 import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
+import io.sitewhere.k8s.crd.ApiConstants;
+import io.sitewhere.k8s.crd.ResourceContexts;
+import io.sitewhere.k8s.crd.ResourceLabels;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroserviceList;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineList;
-import io.sitewhere.operator.controller.ApiConstants;
 import io.sitewhere.operator.controller.ResourceAnnotations;
 import io.sitewhere.operator.controller.ResourceChangeType;
-import io.sitewhere.operator.controller.ResourceContexts;
-import io.sitewhere.operator.controller.ResourceLabels;
 import io.sitewhere.operator.controller.SiteWhereComponentRoles;
 import io.sitewhere.operator.controller.SiteWhereResourceController;
 
@@ -456,11 +456,12 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      * @return
      */
     protected boolean deleteTenantEngines(SiteWhereMicroservice microservice) {
-	SiteWhereTenantEngineList list = getTenantEngines().inNamespace(microservice.getMetadata().getNamespace())
+	SiteWhereTenantEngineList list = getSitewhereClient().getTenantEngines()
+		.inNamespace(microservice.getMetadata().getNamespace())
 		.withLabel(ResourceLabels.LABEL_SITEWHERE_MICROSERVICE, microservice.getMetadata().getName()).list();
 	LOGGER.info(String.format("Deleting %s tenant engines for microservice '%s'",
 		String.valueOf(list.getItems().size()), microservice.getMetadata().getName()));
-	return getTenantEngines().inNamespace(microservice.getMetadata().getNamespace())
+	return getSitewhereClient().getTenantEngines().inNamespace(microservice.getMetadata().getNamespace())
 		.withLabel(ResourceLabels.LABEL_SITEWHERE_MICROSERVICE, microservice.getMetadata().getName()).delete();
     }
 
