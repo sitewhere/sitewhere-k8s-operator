@@ -1,12 +1,11 @@
 apiVersion: sitewhere.io/v1alpha3
 kind: SiteWhereMicroservice
 metadata:
-  name: asset-management-microservice
-  namespace: sitewhere
+  name: instance-management-microservice
 spec:
   replicas: 1
-  instanceName: test-instance
-  functionalArea: asset-management
+  instanceName: sitewhere
+  functionalArea: instance-management
   helm:
     chartName: sitewhere-0.2.6
     releaseName: sitewhere
@@ -19,6 +18,7 @@ spec:
     ports:
       - containerPort: 9000
       - containerPort: 9001
+      - containerPort: 900
       - containerPort: 9090
     env:
       - name: "sitewhere.k8s.pod.ip"
@@ -93,6 +93,7 @@ spec:
         command: ["/bin/grpc_health_probe", "-addr=:9003"]
       initialDelaySeconds:
       periodSeconds: 60
+
   serviceSpec:
     type: LoadBalancer
     ports:
@@ -104,12 +105,15 @@ spec:
         targetPort: 9001
         protocol: TCP
         name: grpc-management
+      - port: 9004
+        targetPort: 9004
+        protocol: TCP
+        name: grpc-user-management
       - port: 9090
         targetPort: 9090
         protocol: TCP
         name: http-metrics
   debug:
     enabled: false
-    jdwpPort: 8006
-    jmxPort: 1106
-    
+    jdwpPort: 8001
+    jmxPort: 1101

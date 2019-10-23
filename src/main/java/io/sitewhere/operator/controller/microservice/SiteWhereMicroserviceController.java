@@ -35,14 +35,14 @@ import io.fabric8.kubernetes.client.informers.SharedInformerFactory;
 import io.sitewhere.k8s.crd.ApiConstants;
 import io.sitewhere.k8s.crd.ResourceContexts;
 import io.sitewhere.k8s.crd.ResourceLabels;
+import io.sitewhere.k8s.crd.controller.ResourceChangeType;
+import io.sitewhere.k8s.crd.controller.SiteWhereResourceController;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroserviceList;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineList;
 import io.sitewhere.operator.controller.ResourceAnnotations;
-import io.sitewhere.operator.controller.ResourceChangeType;
 import io.sitewhere.operator.controller.SiteWhereComponentRoles;
-import io.sitewhere.operator.controller.SiteWhereResourceController;
 
 /**
  * Resource controller for SiteWhere microservice monitoring.

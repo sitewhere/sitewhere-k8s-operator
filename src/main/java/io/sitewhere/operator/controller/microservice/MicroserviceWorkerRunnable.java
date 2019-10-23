@@ -7,8 +7,8 @@
  */
 package io.sitewhere.operator.controller.microservice;
 
+import io.sitewhere.k8s.crd.controller.ResourceChangeType;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
-import io.sitewhere.operator.controller.ResourceChangeType;
 
 /**
  * Base class for workers that repond to microservice resource updates.

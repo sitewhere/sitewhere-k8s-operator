@@ -7,8 +7,8 @@
  */
 package io.sitewhere.operator.controller.tenant;
 
+import io.sitewhere.k8s.crd.controller.ResourceChangeType;
 import io.sitewhere.k8s.crd.tenant.SiteWhereTenant;
-import io.sitewhere.operator.controller.ResourceChangeType;
 
 /**
  * Base class for workers that repond to tenant resource updates.
