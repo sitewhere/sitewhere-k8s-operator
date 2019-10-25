@@ -133,32 +133,20 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
 	if (instance.getStatus() == null) {
 	    instance.setStatus(new SiteWhereInstanceStatus());
 	}
-	boolean initialInstanceStatus = instance.getStatus().isInstanceConfigured();
 
 	// Verify that instance configuration template exists.
 	InstanceConfigurationTemplate ict = verifyInstanceConfigurationTemplate(instance);
 
-	// Copy configuration from template if not already set.
+	// Copy configuration from template and save if not already set.
 	boolean hadConfiguration = instance.getSpec().getConfiguration() != null;
 	if (!hadConfiguration) {
 	    LOGGER.info("Instance configuration not set. Copying from template.");
 	    instance.getSpec().setConfiguration(ict.getSpec().getConfiguration());
-	}
-
-	// Update status values based on current
-	instance.getStatus().setInstanceConfigured(instance.getSpec().getConfiguration() != null);
-
-	boolean instanceStatusUpdated = initialInstanceStatus != instance.getStatus().isInstanceConfigured();
-
-	// Look up instance and make updates.
-	if (!hadConfiguration || instanceStatusUpdated) {
-	    LOGGER.info("Saving instance specification/status updates.");
-	    return getSitewhereClient().getInstances().withName(instance.getMetadata().getName())
+	    instance = getSitewhereClient().getInstances().withName(instance.getMetadata().getName())
 		    .createOrReplace(instance);
-	} else {
-	    LOGGER.info("Leaving existing instance configuration settings.");
-	    return instance;
 	}
+
+	return instance;
     }
 
     /**

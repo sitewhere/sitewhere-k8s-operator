@@ -16,7 +16,7 @@
 			<AppenderRef ref="console" />
 		</Logger>
 		<Logger name="io.fabric8.kubernetes.client.informers"
-			level="INFO" additivity="false">
+			level="ERROR" additivity="false">
 			<AppenderRef ref="console" />
 		</Logger>
 		<Root level="INFO" additivity="false">
