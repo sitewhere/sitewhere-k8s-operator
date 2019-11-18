@@ -5,7 +5,7 @@ buildscript {
 	dependencies {
 		classpath 'com.bmuschko:gradle-docker-plugin:4.6.0'
 		classpath "gradle.plugin.nl.javadude.gradle.plugins:license-gradle-plugin:0.14.0"
-		classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+		classpath 'com.github.jengelman.gradle.plugins:shadow:4.0.4'
 	}
 }
 
@@ -66,7 +66,7 @@ allprojects {
     
 	// Library dependencies.
     dependencies {
-		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: '0.0.9'
+		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: '0.0.10'
 	
 		compile group: 'com.google.guava', name: 'guava', version: '28.0-jre'
 		
@@ -83,14 +83,14 @@ task dockerFile(type: com.bmuschko.gradle.docker.tasks.image.Dockerfile, depends
 	instruction "LABEL maintainer=${rootProject.ext['docker.maintainer']}"
 		
 	// Copy Spring Boot jar.
-	copyFile("${project.name}-${project.version}-all.jar", "/")
+	copyFile("${project.name}-${project.version}.jar", "/")
 			
-	defaultCommand 'java', '-server', '-Xmx512M', '-Xss384K', '-jar', "/${project.name}-${project.version}-all.jar"	
+	defaultCommand 'java', '-server', '-Xmx512M', '-Xss384K', '-jar', "/${project.name}-${project.version}.jar"	
 }
 
 // Copy artifact to Docker input folder.
 task copyArtifactsToDocker(type: Copy, dependsOn: dockerFile) {
-    from "${buildDir}/libs/${project.name}-${project.version}-all.jar"
+    from "${buildDir}/libs/${project.name}-${project.version}.jar"
     into 'build/docker'
 }
 
