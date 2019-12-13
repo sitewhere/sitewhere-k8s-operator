@@ -19,4 +19,4 @@ spec:
     spec:
       containers:
       - name: operator
-        image: sitewhere/sitewhere-k8s-operator:2.2.0
+        image: sitewhere/sitewhere-k8s-operator:3.0.0.alpha1
