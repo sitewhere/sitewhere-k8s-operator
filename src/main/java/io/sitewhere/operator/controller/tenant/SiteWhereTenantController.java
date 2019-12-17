@@ -136,6 +136,7 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
 	Map<String, String> labels = new HashMap<>();
 	labels.put(ResourceLabels.LABEL_SITEWHERE_TENANT, tenant.getMetadata().getName());
 	labels.put(ResourceLabels.LABEL_SITEWHERE_MICROSERVICE, microservice.getMetadata().getName());
+	labels.put(ResourceLabels.LABEL_SITEWHERE_FUNCTIONAL_AREA, microservice.getSpec().getFunctionalArea());
 	engine.getMetadata().setLabels(labels);
 
 	// Look up tenant configuration template for tenant/microservice combination.
@@ -168,9 +169,10 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
 	// List all microservices and check whether engines exist for each.
 	SiteWhereMicroserviceList allMicroservices = getAllMicroservices(tenant);
 	for (SiteWhereMicroservice microservice : allMicroservices.getItems()) {
+	    boolean supportsMultitenant = microservice.getSpec().isMultitenant();
 
 	    // Create engine if not found.
-	    if (enginesByMicroservice.get(microservice.getMetadata().getName()) == null) {
+	    if (supportsMultitenant && enginesByMicroservice.get(microservice.getMetadata().getName()) == null) {
 		createNewTenantEngine(tenant, microservice);
 	    }
 	}
