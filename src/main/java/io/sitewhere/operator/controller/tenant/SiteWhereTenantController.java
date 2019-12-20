@@ -33,6 +33,7 @@ import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngine;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineList;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineSpec;
 import io.sitewhere.k8s.crd.tenant.engine.configuration.TenantEngineConfigurationTemplate;
+import io.sitewhere.operator.controller.microservice.SiteWhereMicroserviceController;
 
 /**
  * Resource controller for SiteWhere microservice monitoring.
@@ -108,11 +109,12 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
 	    LOGGER.warn(message);
 	    throw new RuntimeException(message);
 	}
-	String target = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL, microservice.getSpec().getFunctionalArea());
+	String target = CaseFormat.LOWER_HYPHEN.to(CaseFormat.LOWER_CAMEL,
+		SiteWhereMicroserviceController.getFunctionalArea(microservice));
 	String tecTemplateName = tenantTemplate.getSpec().getTenantEngineTemplates().get(target);
 	if (tecTemplateName == null) {
 	    String message = String.format("Missing tenant engine template mapping for '%s'.",
-		    microservice.getSpec().getFunctionalArea());
+		    SiteWhereMicroserviceController.getFunctionalArea(microservice));
 	    LOGGER.warn(message);
 	    return null;
 	}
@@ -136,7 +138,8 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
 	Map<String, String> labels = new HashMap<>();
 	labels.put(ResourceLabels.LABEL_SITEWHERE_TENANT, tenant.getMetadata().getName());
 	labels.put(ResourceLabels.LABEL_SITEWHERE_MICROSERVICE, microservice.getMetadata().getName());
-	labels.put(ResourceLabels.LABEL_SITEWHERE_FUNCTIONAL_AREA, microservice.getSpec().getFunctionalArea());
+	labels.put(ResourceLabels.LABEL_SITEWHERE_FUNCTIONAL_AREA,
+		SiteWhereMicroserviceController.getFunctionalArea(microservice));
 	engine.getMetadata().setLabels(labels);
 
 	// Look up tenant configuration template for tenant/microservice combination.

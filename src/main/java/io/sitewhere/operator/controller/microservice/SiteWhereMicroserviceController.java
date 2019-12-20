@@ -124,13 +124,44 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     }
 
     /**
+     * Get instance name for a microservice.
+     * 
+     * @param microservice
+     * @return
+     */
+    public static String getInstanceName(SiteWhereMicroservice microservice) {
+	String instanceName = microservice.getMetadata().getLabels().get(ResourceLabels.LABEL_SITEWHERE_INSTANCE);
+	if (instanceName == null) {
+	    throw new RuntimeException(String.format("Microservice '%s' does not have an instance name label.",
+		    microservice.getMetadata().getName()));
+	}
+	return instanceName;
+    }
+
+    /**
+     * Get functional area for a microservice.
+     * 
+     * @param microservice
+     * @return
+     */
+    public static String getFunctionalArea(SiteWhereMicroservice microservice) {
+	String functionalArea = microservice.getMetadata().getLabels()
+		.get(ResourceLabels.LABEL_SITEWHERE_FUNCTIONAL_AREA);
+	if (functionalArea == null) {
+	    throw new RuntimeException(String.format("Microservice '%s' does not have a functional area label.",
+		    microservice.getMetadata().getName()));
+	}
+	return functionalArea;
+    }
+
+    /**
      * Get name for a microservice.
      * 
      * @param microservice
      * @return
      */
     protected String getMicroserviceName(SiteWhereMicroservice microservice) {
-	return String.format("%s-%s", ApiConstants.SITEWHERE_APP_NAME, microservice.getSpec().getFunctionalArea());
+	return String.format("%s-%s", ApiConstants.SITEWHERE_APP_NAME, getFunctionalArea(microservice));
     }
 
     /**
@@ -141,7 +172,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      */
     protected String getDeploymentName(SiteWhereMicroservice microservice) {
 	return String.format("%s-%s", microservice.getSpec().getHelm().getReleaseName(),
-		microservice.getSpec().getFunctionalArea());
+		getFunctionalArea(microservice));
     }
 
     /**
@@ -151,11 +182,11 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      */
     protected Map<String, String> deploymentLabels(SiteWhereMicroservice microservice) {
 	Map<String, String> labels = new HashMap<>();
-	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, microservice.getSpec().getFunctionalArea());
+	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getFunctionalArea(microservice));
 	labels.put(ResourceLabels.LABEL_SITEWHERE_ROLE, SiteWhereComponentRoles.ROLE_MICROSERVICE);
-	labels.put(ResourceLabels.LABEL_SITEWHERE_INSTANCE, microservice.getSpec().getInstanceName());
+	labels.put(ResourceLabels.LABEL_SITEWHERE_INSTANCE, getInstanceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_NAME, ApiConstants.SITEWHERE_APP_NAME);
-	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName());
+	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_MANAGED_BY, microservice.getSpec().getHelm().getReleaseService());
 	labels.put(ResourceLabels.LABEL_HELM_CHART, microservice.getSpec().getHelm().getChartName());
 	return labels;
@@ -168,7 +199,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      */
     protected Map<String, String> deploymentMatchLabels(SiteWhereMicroservice microservice) {
 	Map<String, String> labels = new HashMap<>();
-	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName());
+	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_NAME, getMicroserviceName(microservice));
 	return labels;
     }
@@ -181,8 +212,8 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     protected Map<String, String> podLabels(SiteWhereMicroservice microservice) {
 	Map<String, String> labels = new HashMap<>();
 	labels.put(ResourceLabels.LABEL_K8S_NAME, getMicroserviceName(microservice));
-	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName());
-	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, microservice.getSpec().getFunctionalArea());
+	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice));
+	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getFunctionalArea(microservice));
 	labels.put(ResourceLabels.LABEL_SITEWHERE_ROLE, SiteWhereComponentRoles.ROLE_MICROSERVICE);
 	return labels;
     }
@@ -207,11 +238,11 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      */
     protected Map<String, String> serviceLabels(SiteWhereMicroservice microservice) {
 	Map<String, String> labels = new HashMap<>();
-	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, microservice.getSpec().getFunctionalArea());
+	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getFunctionalArea(microservice));
 	labels.put(ResourceLabels.LABEL_SITEWHERE_ROLE, SiteWhereComponentRoles.ROLE_MICROSERVICE);
-	labels.put(ResourceLabels.LABEL_SITEWHERE_INSTANCE, microservice.getSpec().getInstanceName());
+	labels.put(ResourceLabels.LABEL_SITEWHERE_INSTANCE, getInstanceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_NAME, ApiConstants.SITEWHERE_APP_NAME);
-	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName());
+	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_MANAGED_BY, microservice.getSpec().getHelm().getReleaseService());
 	labels.put(ResourceLabels.LABEL_HELM_CHART, microservice.getSpec().getHelm().getChartName());
 	return labels;
@@ -226,12 +257,12 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     protected String buildPodImageName(SiteWhereMicroservice microservice) {
 	if (microservice.getSpec().getDebug() != null && microservice.getSpec().getDebug().isEnabled()) {
 	    return String.format("%s/%s/service-%s:debug-%s", microservice.getSpec().getPodSpec().getImageRegistry(),
-		    microservice.getSpec().getPodSpec().getImageRepository(),
-		    microservice.getSpec().getFunctionalArea(), microservice.getSpec().getPodSpec().getImageTag());
+		    microservice.getSpec().getPodSpec().getImageRepository(), getFunctionalArea(microservice),
+		    microservice.getSpec().getPodSpec().getImageTag());
 	} else {
 	    return String.format("%s/%s/service-%s:%s", microservice.getSpec().getPodSpec().getImageRegistry(),
-		    microservice.getSpec().getPodSpec().getImageRepository(),
-		    microservice.getSpec().getFunctionalArea(), microservice.getSpec().getPodSpec().getImageTag());
+		    microservice.getSpec().getPodSpec().getImageRepository(), getFunctionalArea(microservice),
+		    microservice.getSpec().getPodSpec().getImageTag());
 	}
     }
 
@@ -360,7 +391,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	builder.withNewSpec().withType(microservice.getSpec().getServiceSpec().getType())
 		.withPorts(microservice.getSpec().getServiceSpec().getPorts())
 		.addToSelector(ResourceLabels.LABEL_K8S_NAME, getMicroserviceName(microservice))
-		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName()).endSpec();
+		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice)).endSpec();
 
 	// Create debug service.
 	Service service = getClient().services().create(builder.build());
@@ -428,7 +459,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 			new IntOrStringBuilder().withIntVal(microservice.getSpec().getDebug().getJmxPort()).build())
 		.withProtocol("TCP").endPort()
 		.addToSelector(ResourceLabels.LABEL_K8S_NAME, getMicroserviceName(microservice))
-		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, microservice.getSpec().getInstanceName()).endSpec();
+		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice)).endSpec();
 
 	// Create debug service.
 	Service service = getClient().services().create(builder.build());
