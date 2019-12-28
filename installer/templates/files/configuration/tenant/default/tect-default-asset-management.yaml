@@ -7,5 +7,10 @@ metadata:
 spec:
   configuration: 
     datastore:
-      type: mongodb
-      reference: tenant
+      type: postrgres95
+      configuration:
+        hostname: "sitewhere-postgresql"
+        port: 5000
+        username: "syncope"
+        password: "syncope"
+        
