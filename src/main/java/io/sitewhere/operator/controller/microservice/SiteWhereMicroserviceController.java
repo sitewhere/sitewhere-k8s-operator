@@ -171,8 +171,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      * @return
      */
     protected String getDeploymentName(SiteWhereMicroservice microservice) {
-	return String.format("%s-%s", microservice.getSpec().getHelm().getReleaseName(),
-		getFunctionalArea(microservice));
+	return String.format("%s-%s", ApiConstants.SITEWHERE_APP_NAME, getFunctionalArea(microservice));
     }
 
     /**
