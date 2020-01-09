@@ -3,7 +3,7 @@ kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-device-management
   labels:
-      sitewhere.io/functional-area: device-management
+    sitewhere.io/functional-area: device-management
 spec:
   configuration: 
     datastore:

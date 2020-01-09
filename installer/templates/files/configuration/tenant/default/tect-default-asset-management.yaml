@@ -3,7 +3,7 @@ kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-asset-management
   labels:
-      sitewhere.io/functional-area: asset-management
+    sitewhere.io/functional-area: asset-management
 spec:
   configuration: 
     datastore:
