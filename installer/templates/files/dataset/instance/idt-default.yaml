@@ -1,7 +1,7 @@
 apiVersion: templates.sitewhere.io/v1alpha3
 kind: InstanceDatasetTemplate
 metadata:
-  name: instance-dataset-default
+  name: default
 spec:
   datasets:
     tenantManagement: |
@@ -11,7 +11,7 @@ spec:
       	logger.info('Default tenant already exists.');
       } else {
         tenant = tenantBuilder.newTenant('default', 'Default Tenant', 'sitewhere1234567890',
-          'https://s3.amazonaws.com/sitewhere-demo/sitewhere-small.png', 'mongodb', 'construction')
+          'https://s3.amazonaws.com/sitewhere-demo/sitewhere-small.png', 'default', 'construction')
         tenant.withAuthorizedUserId('admin' )
         tenant.withAuthorizedUserId('noadmin')
         tenant = tenantBuilder.persist(tenant)

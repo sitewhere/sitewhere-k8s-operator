@@ -7,10 +7,10 @@ metadata:
 spec:
   configuration: 
     datastore:
-      type: postrgres95
+      type: postgres95
       configuration:
         hostname: "sitewhere-postgresql"
-        port: 5000
+        port: 5432
         username: "syncope"
         password: "syncope"
         

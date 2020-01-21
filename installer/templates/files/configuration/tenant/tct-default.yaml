@@ -1,10 +1,10 @@
 apiVersion: templates.sitewhere.io/v1alpha3
 kind: TenantConfigurationTemplate
 metadata:
-  name: mongodb
+  name: default
 spec:
-  name: MongoDB
-  description: MongoDB persistence for all management interfaces
+  name: Default
+  description: Default with RDB persistence for master data and Warp 10 for time series data
   tenantEngineTemplates:
     assetManagement: default-asset-management
     batchOperations: default-batch-operations

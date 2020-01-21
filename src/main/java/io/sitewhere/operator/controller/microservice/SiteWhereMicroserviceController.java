@@ -40,7 +40,6 @@ import io.sitewhere.k8s.crd.controller.SiteWhereResourceController;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroserviceList;
-import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineList;
 import io.sitewhere.operator.controller.ResourceAnnotations;
 import io.sitewhere.operator.controller.SiteWhereComponentRoles;
 
@@ -480,22 +479,6 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     }
 
     /**
-     * Deletes any tenant engines associated with the microservice.
-     * 
-     * @param microservice
-     * @return
-     */
-    protected boolean deleteTenantEngines(SiteWhereMicroservice microservice) {
-	SiteWhereTenantEngineList list = getSitewhereClient().getTenantEngines()
-		.inNamespace(microservice.getMetadata().getNamespace())
-		.withLabel(ResourceLabels.LABEL_SITEWHERE_MICROSERVICE, microservice.getMetadata().getName()).list();
-	LOGGER.info(String.format("Deleting %s tenant engines for microservice '%s'",
-		String.valueOf(list.getItems().size()), microservice.getMetadata().getName()));
-	return getSitewhereClient().getTenantEngines().inNamespace(microservice.getMetadata().getNamespace())
-		.withLabel(ResourceLabels.LABEL_SITEWHERE_MICROSERVICE, microservice.getMetadata().getName()).delete();
-    }
-
-    /**
      * Creates k8s resources associated with new SiteWhere microservice.
      */
     protected class MicroserviceCreationWorker extends MicroserviceWorkerRunnable {
@@ -629,9 +612,6 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	    // Delete debug service.
 	    deleteDebugService(getMicroservice());
 	    LOGGER.info(String.format("Deleted debug service for microservice %s", name));
-
-	    // Delete tenant engines.
-	    deleteTenantEngines(getMicroservice());
 	}
     }
 

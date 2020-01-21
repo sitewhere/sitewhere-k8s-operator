@@ -1,6 +1,6 @@
 {{ .Files.Get "files/configuration/instance/ict-default.yaml" }}
 ---
-{{ .Files.Get "files/configuration/tenant/tct-mongodb.yaml" }}
+{{ .Files.Get "files/configuration/tenant/tct-default.yaml" }}
 ---
 {{ .Files.Get "files/configuration/tenant/default/tect-default-asset-management.yaml" }}
 ---
