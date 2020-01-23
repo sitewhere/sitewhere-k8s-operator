@@ -16,7 +16,7 @@ ext['docker.maintainer'] = 'admin@sitewhere.com'
     
 allprojects {
     group = 'com.sitewhere'
-	version = '3.0.0.alpha1'
+	version = '3.0.0.alpha2'
 	
     repositories {
 		mavenLocal()
@@ -66,9 +66,11 @@ allprojects {
     
 	// Library dependencies.
     dependencies {
-		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: '0.0.19'
+   		compile enforcedPlatform('io.quarkus:quarkus-bom:1.1.1.Final')
+   		
+		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: '0.0.20'
 	
-		compile group: 'com.google.guava', name: 'guava', version: '28.0-jre'
+		compile group: 'com.google.guava', name: 'guava'
 		
     	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.1'
 		
