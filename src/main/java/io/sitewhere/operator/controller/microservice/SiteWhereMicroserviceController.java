@@ -40,6 +40,10 @@ import io.sitewhere.k8s.crd.controller.SiteWhereResourceController;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroserviceList;
+import io.sitewhere.k8s.crd.tenant.SiteWhereTenant;
+import io.sitewhere.k8s.crd.tenant.SiteWhereTenantList;
+import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngine;
+import io.sitewhere.operator.controller.OperatorUtils;
 import io.sitewhere.operator.controller.ResourceAnnotations;
 import io.sitewhere.operator.controller.SiteWhereComponentRoles;
 
@@ -332,7 +336,8 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		.withTemplate(buildPodTemplate(microservice)).endSpec();
 
 	// Create deployment.
-	Deployment deployment = getClient().apps().deployments().createOrReplace(dbuilder.build());
+	Deployment deployment = getClient().apps().deployments().inNamespace(microservice.getMetadata().getNamespace())
+		.withName(deployName).createOrReplace(dbuilder.build());
 	return deployment;
     }
 
@@ -392,7 +397,8 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice)).endSpec();
 
 	// Create debug service.
-	Service service = getClient().services().create(builder.build());
+	Service service = getClient().services().inNamespace(microservice.getMetadata().getNamespace())
+		.withName(svcName).createOrReplace(builder.build());
 	return service;
     }
 
@@ -460,7 +466,8 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		.addToSelector(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice)).endSpec();
 
 	// Create debug service.
-	Service service = getClient().services().create(builder.build());
+	Service service = getClient().services().inNamespace(microservice.getMetadata().getNamespace())
+		.withName(debugSvcName).createOrReplace(builder.build());
 	return service;
     }
 
@@ -470,12 +477,33 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      * @param microservice
      * @return
      */
-    protected Boolean deleteDebugService(SiteWhereMicroservice microservice) {
+    protected Boolean deleteDebugServiceIfExists(SiteWhereMicroservice microservice) {
 	Service service = getDebugService(microservice);
 	if (service != null) {
 	    return getClient().services().delete(service);
 	}
 	return true;
+    }
+
+    /**
+     * Creates tenant engines for each tenant that does not already have one for a
+     * newly added microservice.
+     * 
+     * @param microservice
+     */
+    protected void createTenantEnginesForExistingTenants(SiteWhereMicroservice microservice) {
+	SiteWhereTenantList all = OperatorUtils.getAllTenants(getSitewhereClient());
+	Map<String, SiteWhereTenantEngine> existing = OperatorUtils
+		.getTenantEnginesForMicroserviceByTenant(getSitewhereClient(), microservice);
+	for (SiteWhereTenant tenant : all.getItems()) {
+	    String tenantId = tenant.getMetadata().getName();
+	    if (existing.get(tenantId) == null) {
+		LOGGER.info(String.format(
+			"No tenant engine found for tenant '%s' on microservice '%s' creation. Adding tenant engine.",
+			tenantId, microservice.getMetadata().getName()));
+		OperatorUtils.createNewTenantEngine(getSitewhereClient(), tenant, microservice);
+	    }
+	}
     }
 
     /**
@@ -517,7 +545,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	    }
 
 	    // Create debug service if debug enabled.
-	    if (!getMicroservice().getSpec().getDebug().isEnabled()) {
+	    if (getMicroservice().getSpec().getDebug().isEnabled()) {
 		Service debugSvc = getDebugService(getMicroservice());
 		if (debugSvc == null) {
 		    debugSvc = createOrUpdateDebugService(getMicroservice());
@@ -527,9 +555,12 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 		    }
 		}
 	    } else {
-		deleteDebugService(getMicroservice());
+		deleteDebugServiceIfExists(getMicroservice());
 		LOGGER.info(String.format("Deleted debug service for microservice %s", name));
 	    }
+
+	    // Create tenant engines for existing tenants if not already present.
+	    createTenantEnginesForExistingTenants(getMicroservice());
 	}
     }
 
@@ -568,14 +599,14 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	    }
 
 	    // Create debug service if debug enabled.
-	    if (!getMicroservice().getSpec().getDebug().isEnabled()) {
+	    if (getMicroservice().getSpec().getDebug().isEnabled()) {
 		Service debugSvc = createOrUpdateDebugService(getMicroservice());
 		LOGGER.info(String.format("Updated debug service for microservice %s", name));
 		if (LOGGER.isDebugEnabled()) {
 		    LOGGER.debug(String.format("Updated debug service:\n\n%s", debugSvc.toString()));
 		}
 	    } else {
-		deleteDebugService(getMicroservice());
+		deleteDebugServiceIfExists(getMicroservice());
 		LOGGER.info(String.format("Deleted debug service for microservice %s", name));
 	    }
 	}
@@ -610,7 +641,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	    LOGGER.info(String.format("Deleted service for microservice %s", name));
 
 	    // Delete debug service.
-	    deleteDebugService(getMicroservice());
+	    deleteDebugServiceIfExists(getMicroservice());
 	    LOGGER.info(String.format("Deleted debug service for microservice %s", name));
 	}
     }

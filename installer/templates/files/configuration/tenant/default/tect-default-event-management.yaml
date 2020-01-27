@@ -9,6 +9,6 @@ spec:
     datastore:
       type: warp10
       configuration:
-        hostname: "sitewhere-warp10"
+        hostname: "sitewhere-infrastructure-warp10"
         application: "sitewhere"
         tokenSecret: "sitewhere"
