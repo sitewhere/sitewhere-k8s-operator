@@ -41,7 +41,7 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
     private static final int RESYNC_PERIOD_MS = 10 * 60 * 1000;
 
     /** Workers for handling microservice resource tasks */
-    private ExecutorService workers = Executors.newFixedThreadPool(2);
+    private ExecutorService workers = Executors.newFixedThreadPool(5);
 
     public SiteWhereTenantController(KubernetesClient client, SharedInformerFactory informerFactory) {
 	super(client, informerFactory);

@@ -59,7 +59,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     private static final int RESYNC_PERIOD_MS = 10 * 60 * 1000;
 
     /** Workers for handling microrservice resource tasks */
-    private ExecutorService workers = Executors.newFixedThreadPool(2);
+    private ExecutorService workers = Executors.newFixedThreadPool(10);
 
     public SiteWhereMicroserviceController(KubernetesClient client, SharedInformerFactory informerFactory) {
 	super(client, informerFactory);

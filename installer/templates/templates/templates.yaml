@@ -46,6 +46,8 @@
 ---
 {{ .Files.Get "files/dataset/instance/idt-default.yaml" }}
 ---
+{{ .Files.Get "files/dataset/tenant/default/tedt-default-schedule-model.yaml" }}
+---
 {{ .Files.Get "files/dataset/tenant/tdt-construction.yaml" }}
 ---
 {{ .Files.Get "files/dataset/tenant/construction/tedt-construction-asset-model.yaml" }}

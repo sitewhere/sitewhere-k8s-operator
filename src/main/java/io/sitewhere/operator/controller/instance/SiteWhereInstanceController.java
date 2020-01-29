@@ -142,8 +142,7 @@ public class SiteWhereInstanceController extends SiteWhereResourceController<Sit
 	if (!hadConfiguration) {
 	    LOGGER.info("Instance configuration not set. Copying from template.");
 	    instance.getSpec().setConfiguration(ict.getSpec().getConfiguration());
-	    instance = getSitewhereClient().getInstances().withName(instance.getMetadata().getName())
-		    .createOrReplace(instance);
+	    instance = getSitewhereClient().getInstances().withName(instance.getMetadata().getName()).replace(instance);
 	} else {
 	    LOGGER.info("Instance configuration was already set. Not copying from template.");
 	}
