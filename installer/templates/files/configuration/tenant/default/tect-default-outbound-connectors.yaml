@@ -10,6 +10,6 @@ spec:
       - id: mqtt1
         type: mqtt
         configuration:
-          hostname: ${mqtt.host:sitewhere-infrastructure-mosquitto}
+          hostname: ${mqtt.host:sitewhere-infrastructure-mosquitto.default}
           port: ${mqtt.port:1883}
           topic: SiteWhere/${tenant.token}/output/mqtt

@@ -63,4 +63,14 @@
 {{ .Files.Get "files/dataset/tenant/airtraffic/tedt-airtraffic-device-model.yaml" }}
 ---
 {{ .Files.Get "files/dataset/tenant/tdt-empty.yaml" }}
+---
+{{ .Files.Get "files/scripts/command-delivery/scrt-command-encoder.yaml" }}
+---
+{{ .Files.Get "files/scripts/event-sources/scrt-binary-decoder.yaml" }}
+---
+{{ .Files.Get "files/scripts/outbound-connectors/scrt-filter.yaml" }}
+---
+{{ .Files.Get "files/scripts/outbound-connectors/scrt-payload-builder.yaml" }}
+---
+{{ .Files.Get "files/scripts/outbound-connectors/scrt-uri-builder.yaml" }}
 

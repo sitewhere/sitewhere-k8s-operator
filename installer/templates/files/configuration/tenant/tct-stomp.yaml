@@ -18,7 +18,6 @@ spec:
     inboundProcessing: default-inbound-processing
     labelGeneration: default-label-generation
     outboundConnectors: default-outbound-connectors
-    ruleProcessing: default-rule-processing
     scheduleManagement: default-schedule-management
     streamingMedia: default-streaming-media
     
