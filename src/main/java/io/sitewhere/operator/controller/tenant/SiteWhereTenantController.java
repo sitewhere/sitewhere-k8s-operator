@@ -21,13 +21,13 @@ import io.sitewhere.k8s.crd.ResourceContexts;
 import io.sitewhere.k8s.crd.ResourceLabels;
 import io.sitewhere.k8s.crd.controller.ResourceChangeType;
 import io.sitewhere.k8s.crd.controller.SiteWhereResourceController;
+import io.sitewhere.k8s.crd.exception.SiteWhereK8sException;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroserviceList;
 import io.sitewhere.k8s.crd.tenant.SiteWhereTenant;
 import io.sitewhere.k8s.crd.tenant.SiteWhereTenantList;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngine;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngineList;
-import io.sitewhere.operator.controller.OperatorUtils;
 
 /**
  * Resource controller for SiteWhere microservice monitoring.
@@ -73,8 +73,8 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
      */
     protected void validateTenantEngines(SiteWhereTenant tenant) {
 	// Index existing tenant engines by microservice.
-	Map<String, SiteWhereTenantEngine> enginesByMicroservice = OperatorUtils
-		.getTenantEnginesForTenantByMicroservice(getSitewhereClient(), tenant);
+	Map<String, SiteWhereTenantEngine> enginesByMicroservice = getSitewhereClient()
+		.getTenantEnginesForTenantByMicroservice(tenant);
 
 	// List all microservices and check whether engines exist for each.
 	SiteWhereMicroserviceList allMicroservices = getAllMicroservices(tenant);
@@ -83,7 +83,12 @@ public class SiteWhereTenantController extends SiteWhereResourceController<SiteW
 
 	    // Create engine if not found.
 	    if (supportsMultitenant && enginesByMicroservice.get(microservice.getMetadata().getName()) == null) {
-		OperatorUtils.createNewTenantEngine(getSitewhereClient(), tenant, microservice);
+		try {
+		    getSitewhereClient().createNewTenantEngine(tenant, microservice);
+		} catch (SiteWhereK8sException e) {
+		    LOGGER.warn(String.format("Unable to create tenant engine for tenant '%s' + microservice '%s'.",
+			    tenant.getMetadata().getName(), microservice.getMetadata().getName()), e);
+		}
 	    }
 	}
     }

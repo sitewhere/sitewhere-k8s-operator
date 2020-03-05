@@ -37,13 +37,13 @@ import io.sitewhere.k8s.crd.ResourceContexts;
 import io.sitewhere.k8s.crd.ResourceLabels;
 import io.sitewhere.k8s.crd.controller.ResourceChangeType;
 import io.sitewhere.k8s.crd.controller.SiteWhereResourceController;
+import io.sitewhere.k8s.crd.exception.SiteWhereK8sException;
 import io.sitewhere.k8s.crd.instance.SiteWhereInstance;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroservice;
 import io.sitewhere.k8s.crd.microservice.SiteWhereMicroserviceList;
 import io.sitewhere.k8s.crd.tenant.SiteWhereTenant;
 import io.sitewhere.k8s.crd.tenant.SiteWhereTenantList;
 import io.sitewhere.k8s.crd.tenant.engine.SiteWhereTenantEngine;
-import io.sitewhere.operator.controller.OperatorUtils;
 import io.sitewhere.operator.controller.ResourceAnnotations;
 import io.sitewhere.operator.controller.SiteWhereComponentRoles;
 
@@ -142,29 +142,14 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     }
 
     /**
-     * Get functional area for a microservice.
-     * 
-     * @param microservice
-     * @return
-     */
-    public static String getFunctionalArea(SiteWhereMicroservice microservice) {
-	String functionalArea = microservice.getMetadata().getLabels()
-		.get(ResourceLabels.LABEL_SITEWHERE_FUNCTIONAL_AREA);
-	if (functionalArea == null) {
-	    throw new RuntimeException(String.format("Microservice '%s' does not have a functional area label.",
-		    microservice.getMetadata().getName()));
-	}
-	return functionalArea;
-    }
-
-    /**
      * Get name for a microservice.
      * 
      * @param microservice
      * @return
      */
     protected String getMicroserviceName(SiteWhereMicroservice microservice) {
-	return String.format("%s-%s", ApiConstants.SITEWHERE_APP_NAME, getFunctionalArea(microservice));
+	return String.format("%s-%s", ApiConstants.SITEWHERE_APP_NAME,
+		getSitewhereClient().getFunctionalArea(microservice));
     }
 
     /**
@@ -174,7 +159,8 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      * @return
      */
     protected String getDeploymentName(SiteWhereMicroservice microservice) {
-	return String.format("%s-%s", ApiConstants.SITEWHERE_APP_NAME, getFunctionalArea(microservice));
+	return String.format("%s-%s", ApiConstants.SITEWHERE_APP_NAME,
+		getSitewhereClient().getFunctionalArea(microservice));
     }
 
     /**
@@ -184,7 +170,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      */
     protected Map<String, String> deploymentLabels(SiteWhereMicroservice microservice) {
 	Map<String, String> labels = new HashMap<>();
-	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getFunctionalArea(microservice));
+	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getSitewhereClient().getFunctionalArea(microservice));
 	labels.put(ResourceLabels.LABEL_SITEWHERE_ROLE, SiteWhereComponentRoles.ROLE_MICROSERVICE);
 	labels.put(ResourceLabels.LABEL_SITEWHERE_INSTANCE, getInstanceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_NAME, ApiConstants.SITEWHERE_APP_NAME);
@@ -215,7 +201,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	Map<String, String> labels = new HashMap<>();
 	labels.put(ResourceLabels.LABEL_K8S_NAME, getMicroserviceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_INSTANCE, getInstanceName(microservice));
-	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getFunctionalArea(microservice));
+	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getSitewhereClient().getFunctionalArea(microservice));
 	labels.put(ResourceLabels.LABEL_SITEWHERE_ROLE, SiteWhereComponentRoles.ROLE_MICROSERVICE);
 	return labels;
     }
@@ -240,7 +226,7 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      */
     protected Map<String, String> serviceLabels(SiteWhereMicroservice microservice) {
 	Map<String, String> labels = new HashMap<>();
-	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getFunctionalArea(microservice));
+	labels.put(ResourceLabels.LABEL_SITEWHERE_NAME, getSitewhereClient().getFunctionalArea(microservice));
 	labels.put(ResourceLabels.LABEL_SITEWHERE_ROLE, SiteWhereComponentRoles.ROLE_MICROSERVICE);
 	labels.put(ResourceLabels.LABEL_SITEWHERE_INSTANCE, getInstanceName(microservice));
 	labels.put(ResourceLabels.LABEL_K8S_NAME, ApiConstants.SITEWHERE_APP_NAME);
@@ -259,11 +245,13 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     protected String buildPodImageName(SiteWhereMicroservice microservice) {
 	if (microservice.getSpec().getDebug() != null && microservice.getSpec().getDebug().isEnabled()) {
 	    return String.format("%s/%s/service-%s:debug-%s", microservice.getSpec().getPodSpec().getImageRegistry(),
-		    microservice.getSpec().getPodSpec().getImageRepository(), getFunctionalArea(microservice),
+		    microservice.getSpec().getPodSpec().getImageRepository(),
+		    getSitewhereClient().getFunctionalArea(microservice),
 		    microservice.getSpec().getPodSpec().getImageTag());
 	} else {
 	    return String.format("%s/%s/service-%s:%s", microservice.getSpec().getPodSpec().getImageRegistry(),
-		    microservice.getSpec().getPodSpec().getImageRepository(), getFunctionalArea(microservice),
+		    microservice.getSpec().getPodSpec().getImageRepository(),
+		    getSitewhereClient().getFunctionalArea(microservice),
 		    microservice.getSpec().getPodSpec().getImageTag());
 	}
     }
@@ -492,16 +480,21 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
      * @param microservice
      */
     protected void createTenantEnginesForExistingTenants(SiteWhereMicroservice microservice) {
-	SiteWhereTenantList all = OperatorUtils.getAllTenants(getSitewhereClient());
-	Map<String, SiteWhereTenantEngine> existing = OperatorUtils
-		.getTenantEnginesForMicroserviceByTenant(getSitewhereClient(), microservice);
+	SiteWhereTenantList all = getSitewhereClient().getAllTenants(microservice.getMetadata().getNamespace());
+	Map<String, SiteWhereTenantEngine> existing = getSitewhereClient()
+		.getTenantEnginesForMicroserviceByTenant(microservice);
 	for (SiteWhereTenant tenant : all.getItems()) {
 	    String tenantId = tenant.getMetadata().getName();
 	    if (existing.get(tenantId) == null) {
 		LOGGER.info(String.format(
 			"No tenant engine found for tenant '%s' on microservice '%s' creation. Adding tenant engine.",
 			tenantId, microservice.getMetadata().getName()));
-		OperatorUtils.createNewTenantEngine(getSitewhereClient(), tenant, microservice);
+		try {
+		    getSitewhereClient().createNewTenantEngine(tenant, microservice);
+		} catch (SiteWhereK8sException e) {
+		    LOGGER.warn(String.format("Unable to create tenant engine for tenant '%s' + microservice '%s'.",
+			    tenantId, microservice.getMetadata().getName()), e);
+		}
 	    }
 	}
     }
@@ -560,7 +553,9 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	    }
 
 	    // Create tenant engines for existing tenants if not already present.
-	    createTenantEnginesForExistingTenants(getMicroservice());
+	    if (getMicroservice().getSpec().isMultitenant()) {
+		createTenantEnginesForExistingTenants(getMicroservice());
+	    }
 	}
     }
 
