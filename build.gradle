@@ -68,7 +68,7 @@ allprojects {
     dependencies {
    		compile platform('io.quarkus:quarkus-bom:1.2.1.Final')
    		
-		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: '3.0.0.alpha2'
+		compile group: 'com.sitewhere', name: 'sitewhere-k8s-model', version: '3.0.0.alpha3'
 		
     	compile group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2.12.1'
 		
