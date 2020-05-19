@@ -16,7 +16,7 @@ ext['docker.maintainer'] = 'admin@sitewhere.com'
     
 allprojects {
     group = 'com.sitewhere'
-	version = '3.0.0.alpha4'
+	version = '3.0.0.alpha5'
 	
     repositories {
 		mavenLocal()

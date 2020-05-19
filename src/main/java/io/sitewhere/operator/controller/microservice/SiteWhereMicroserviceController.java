@@ -164,6 +164,16 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
     }
 
     /**
+     * Get instance service account name.
+     * 
+     * @param microservice
+     * @return
+     */
+    protected String getInstanceServiceAccountName(SiteWhereMicroservice microservice) {
+	return String.format("%s-%s", "sitewhere-instance-service-account", getInstanceName(microservice));
+    }
+
+    /**
      * Labels for a microservice resource deployment.
      * 
      * @return
@@ -281,8 +291,8 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 	}
 
 	// Create pod spec.
-	builder.withNewSpec().addNewContainer().withName(getMicroserviceName(microservice))
-		.withImage(buildPodImageName(microservice))
+	builder.withNewSpec().withServiceAccountName(getInstanceServiceAccountName(microservice)).addNewContainer()
+		.withName(getMicroserviceName(microservice)).withImage(buildPodImageName(microservice))
 		.withImagePullPolicy(microservice.getSpec().getPodSpec().getImagePullPolicy()).withPorts(ports)
 		.withEnv(microservice.getSpec().getPodSpec().getEnv())
 		.withResources(microservice.getSpec().getPodSpec().getResources())
