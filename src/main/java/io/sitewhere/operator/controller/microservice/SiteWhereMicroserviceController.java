@@ -564,7 +564,10 @@ public class SiteWhereMicroserviceController extends SiteWhereResourceController
 
 	    // Create tenant engines for existing tenants if not already present.
 	    if (getMicroservice().getSpec().isMultitenant()) {
+		LOGGER.info(String.format("Creating Tenant Engine for Microservice %s", name));
 		createTenantEnginesForExistingTenants(getMicroservice());
+	    } else {
+		LOGGER.info(String.format("Skiping Create Tenant Engine for Microservice %s", name));
 	    }
 	}
     }
