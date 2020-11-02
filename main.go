@@ -26,6 +26,9 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+
+	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/api/v1alpha4"
+	"github.com/sitewhere/sitewhere-k8s-operator/controllers"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -37,6 +40,7 @@ var (
 func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
+	utilruntime.Must(sitewhereiov1alpha4.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
@@ -63,6 +67,23 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err = (&controllers.SiteWhereInstanceReconciler{
+		Client:   mgr.GetClient(),
+		Recorder: mgr.GetEventRecorderFor("SiteWhereInstance"),
+		Log:      ctrl.Log.WithName("controllers").WithName("SiteWhereInstance"),
+		Scheme:   mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereInstance")
+		os.Exit(1)
+	}
+	if err = (&controllers.SiteWhereMicroserviceReconciler{
+		Client: mgr.GetClient(),
+		Log:    ctrl.Log.WithName("controllers").WithName("SiteWhereMicroservice"),
+		Scheme: mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereMicroservice")
+		os.Exit(1)
+	}
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")

@@ -1,7 +1,13 @@
-domain: sitewhere.io
 layout: go.kubebuilder.io/v2
 projectName: sitewhere-k8s-operator
 repo: github.com/sitewhere/sitewhere-k8s-operator
+resources:
+- group: sitewhere.io
+  kind: SiteWhereInstance
+  version: v1alpha4
+- group: sitewhere.io
+  kind: SiteWhereMicroservice
+  version: v1alpha4
 version: 3-alpha
 plugins:
   go.sdk.operatorframework.io/v2-alpha: {}
