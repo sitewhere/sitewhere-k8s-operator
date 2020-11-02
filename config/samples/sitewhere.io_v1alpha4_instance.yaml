@@ -1,7 +1,0 @@
-apiVersion: sitewhere.io/v1alpha4
-kind: SiteWhereInstance
-metadata:
-  name: sitewhere
-spec:
-  configurationTemplate: default
-  datasetTemplate: default

@@ -1,5 +1,0 @@
-## Append samples you want in your CSV to this file as resources ##
-resources:
-- sitewhere.io_v1alpha4_instance.yaml
-- sitewhere.io_v1alpha4_microservice.yaml
-# +kubebuilder:scaffold:manifestskustomizesamples
