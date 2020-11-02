@@ -1,9 +1,0 @@
-apiVersion: sitewhere.io/v1alpha3
-kind: SiteWhereTenantEngine
-metadata:
-  name: tenant-engine-1293871273
-  namespace: sitewhere
-  labels:
-    sitewhere.io/tenant: default
-    sitewhere.io/microservice: asset-management-microservice
-spec:
