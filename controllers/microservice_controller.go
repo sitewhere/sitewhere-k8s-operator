@@ -20,7 +20,10 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	core "k8s.io/api/core/v1"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -30,8 +33,9 @@ import (
 // SiteWhereMicroserviceReconciler reconciles a SiteWhereMicroservice object
 type SiteWhereMicroserviceReconciler struct {
 	client.Client
-	Log    logr.Logger
-	Scheme *runtime.Scheme
+	Log      logr.Logger
+	Recorder record.EventRecorder
+	Scheme   *runtime.Scheme
 }
 
 // +kubebuilder:rbac:groups=sitewhere.io,resources=sitewheremicroservices,verbs=get;list;watch;create;update;patch;delete
@@ -40,10 +44,40 @@ type SiteWhereMicroserviceReconciler struct {
 // +kubebuilder:rbac:groups=core,resources=services,verbs=get;list;watch;create;update;patch;delet
 
 func (r *SiteWhereMicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	_ = context.Background()
-	_ = r.Log.WithValues("sitewheremicroservice", req.NamespacedName)
+	ctx := context.Background()
+	log := r.Log.WithValues("sitewheremicroservice", req.NamespacedName)
+	log.Info("Reconcile SiteWhere Microservice")
 
-	// your logic here
+	var swMicroservice sitewhereiov1alpha4.SiteWhereMicroservice
+	if err := r.Get(ctx, req.NamespacedName, &swMicroservice); err != nil {
+		if apierrors.IsNotFound(err) {
+			log.Info("SiteWhere Microservice is deleted")
+		}
+		return ctrl.Result{}, client.IgnoreNotFound(err)
+	}
+
+	msParentInstance, err := LocateParentSiteWhereInstance(ctx, r.Client, &swMicroservice)
+	if err != nil {
+		log.Error(err, "cannot locate instance for microservice")
+		return ctrl.Result{}, err
+	}
+	msDeployment, err := RenderMicroservicesDeployment(msParentInstance, &swMicroservice)
+	if err != nil {
+		log.Error(err, "cannot render deployment for microservice")
+		return ctrl.Result{}, err
+	}
+
+	// Set ownership
+	ctrl.SetControllerReference(&swMicroservice, msDeployment, r.Scheme)
+
+	// server side apply, only the fields we set are touched
+	applyOpts := []client.PatchOption{client.ForceOwnership, client.FieldOwner(swMicroservice.GetUID())}
+	if err := r.Patch(ctx, msDeployment, client.Apply, applyOpts...); err != nil {
+		log.Error(err, "Failed to apply to a deployment")
+		r.Recorder.Event(&swMicroservice, core.EventTypeWarning, "Deployment", err.Error())
+		return ctrl.Result{}, err
+	}
+	r.Recorder.Event(&swMicroservice, core.EventTypeNormal, "Deployment", "Created")
 
 	return ctrl.Result{}, nil
 }

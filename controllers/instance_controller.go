@@ -20,8 +20,10 @@ import (
 	"context"
 
 	"github.com/go-logr/logr"
+	core "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -53,7 +55,34 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
 
-	r.Recorder.Event(&swInstance, "Warning", "ProcessingError", "some error")
+	r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", "Bootstraping")
+
+	swInstance.Status.TenantManagementBootstrapState = sitewhereiov1alpha4.Bootstrapping
+	swInstance.Status.UserManagementBootstrapState = sitewhereiov1alpha4.Bootstrapping
+
+	if err := r.Status().Update(context.Background(), &swInstance); err != nil {
+		return ctrl.Result{}, err
+	}
+
+	microservices, err := RenderMicroservices(&swInstance)
+	if err != nil {
+		log.Error(err, "can not render microservices from instance")
+		return ctrl.Result{}, err
+	}
+	for _, ms := range microservices {
+		// Check if microservice exists
+		var swMicroservice sitewhereiov1alpha4.SiteWhereMicroservice
+		if err := r.Get(ctx, types.NamespacedName{Namespace: ms.Namespace, Name: ms.Name}, &swMicroservice); err != nil {
+			if apierrors.IsNotFound(err) {
+				// Set SiteWhereInstace instance as the owner and controller
+				ctrl.SetControllerReference(&swInstance, ms, r.Scheme)
+				if err := r.Create(ctx, ms); err != nil {
+					log.Error(err, "can not create microservices from instance")
+					return ctrl.Result{}, err
+				}
+			}
+		}
+	}
 
 	return ctrl.Result{}, nil
 }
