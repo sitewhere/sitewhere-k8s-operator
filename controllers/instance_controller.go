@@ -39,8 +39,8 @@ type SiteWhereInstanceReconciler struct {
 	Scheme   *runtime.Scheme
 }
 
-// +kubebuilder:rbac:groups=sitewhere.io,resources=sitewhereinstances,verbs=get;list;watch;create;update;patch;delete
-// +kubebuilder:rbac:groups=sitewhere.io,resources=sitewhereinstances/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=sitewhere.io,resources=instances,verbs=get;list;watch;create;update;patch;delete
+// +kubebuilder:rbac:groups=sitewhere.io,resources=instances/status,verbs=get;update;patch
 
 func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
 	ctx := context.Background()

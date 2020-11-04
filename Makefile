@@ -45,10 +45,23 @@ install: manifests kustomize
 uninstall: manifests kustomize
 	$(KUSTOMIZE) build config/crd | kubectl delete -f -
 
+# Deploy cert-manager
+deploy-cert: 
+	kubectl apply -f deploy/cert-manager/cert-manager.yaml
+
+# Undeploy cert-manager
+undeploy-cert: 
+	kubectl delete -f deploy/cert-manager/cert-manager.yaml
+
 # Deploy controller in the configured Kubernetes cluster in ~/.kube/config
 deploy: manifests kustomize
 	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
 	$(KUSTOMIZE) build config/default | kubectl apply -f -
+
+# Undeploy controller in the configured Kubernetes cluster in ~/.kube/config
+undeploy:
+	cd config/manager && $(KUSTOMIZE) edit set image controller=${IMG}
+	$(KUSTOMIZE) build config/default | kubectl delete -f -
 
 # Generate manifests e.g. CRD, RBAC etc.
 manifests: controller-gen
@@ -67,7 +80,7 @@ generate: controller-gen
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 # Build the docker image
-docker-build: test
+docker-build: #test
 	docker build . -t ${IMG}
 
 # Push the docker image

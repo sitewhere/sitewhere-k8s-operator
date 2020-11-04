@@ -28,8 +28,7 @@ spec:
     status: {}
   validation:
     openAPIV3Schema:
-      description: SiteWhereMicroservice is the Schema for the sitewheremicroservices
-        API
+      description: SiteWhereMicroservice is the Schema for the microservices API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -65,6 +64,15 @@ spec:
           type: object
         status:
           description: SiteWhereMicroserviceStatus defines the observed state of SiteWhereMicroservice
+          properties:
+            deployment:
+              description: Deployment name of the deployment
+              type: string
+            services:
+              description: Services name of services
+              items:
+                type: string
+              type: array
           type: object
       type: object
   version: v1alpha4

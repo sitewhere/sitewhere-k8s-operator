@@ -60,7 +60,7 @@ func main() {
 		MetricsBindAddress: metricsAddr,
 		Port:               9443,
 		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "d4bd861b.my.domain",
+		LeaderElectionID:   "d4bd861b.sitewhere.io",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -84,6 +84,12 @@ func main() {
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereMicroservice")
 		os.Exit(1)
+	}
+	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
+		if err = (&sitewhereiov1alpha4.SiteWhereInstance{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "SiteWhereInstance")
+			os.Exit(1)
+		}
 	}
 	// +kubebuilder:scaffold:builder
 

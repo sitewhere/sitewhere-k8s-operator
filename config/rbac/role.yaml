@@ -33,7 +33,7 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewhereinstances
+  - instances
   verbs:
   - create
   - delete
@@ -45,7 +45,7 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewhereinstances/status
+  - instances/status
   verbs:
   - get
   - patch

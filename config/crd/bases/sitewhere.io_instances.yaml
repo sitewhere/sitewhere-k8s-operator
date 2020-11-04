@@ -62,6 +62,19 @@ spec:
               description: DatasetTemplate is the name of the dataset template of
                 the instance
               type: string
+            dockerSpec:
+              description: DockerSpec is the
+              properties:
+                registry:
+                  description: Registry is the Docker registry
+                  type: string
+                repository:
+                  description: Repository is the Repository for docker images
+                  type: string
+                tag:
+                  description: Tag is the tag for docker images
+                  type: string
+              type: object
           type: object
         status:
           description: SiteWhereInstanceStatus defines the observed state of SiteWhereInstance

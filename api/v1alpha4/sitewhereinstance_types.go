@@ -37,12 +37,24 @@ const (
 	BootstrapFailed = "BootstrapFailed"
 )
 
+// DockerSpec are the spec to access sitewhere docker images
+type DockerSpec struct {
+	// Registry is the Docker registry
+	Registry string `json:"registry,omitempty"`
+	// Repository is the Repository for docker images
+	Repository string `json:"repository,omitempty"`
+	// Tag is the tag for docker images
+	Tag string `json:"tag,omitempty"`
+}
+
 // SiteWhereInstanceSpec defines the desired state of SiteWhereInstance
 type SiteWhereInstanceSpec struct {
 	// ConfigurationTemplate is the name of the configuration template of the instance
 	ConfigurationTemplate string `json:"configurationTemplate,omitempty"`
 	// DatasetTemplate is the name of the dataset template of the instance
 	DatasetTemplate string `json:"datasetTemplate,omitempty"`
+	// DockerSpec is the
+	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
 }
 
 // SiteWhereInstanceStatus defines the observed state of SiteWhereInstance

@@ -40,8 +40,10 @@ type SiteWhereMicroserviceSpec struct {
 
 // SiteWhereMicroserviceStatus defines the observed state of SiteWhereMicroservice
 type SiteWhereMicroserviceStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Deployment name of the deployment
+	Deployment string `json:"deployment,omitempty"`
+	// Services name of services
+	Services []string `json:"services,omitempty"`
 }
 
 // +kubebuilder:object:root=true
@@ -49,7 +51,7 @@ type SiteWhereMicroserviceStatus struct {
 // +kubebuilder:resource:path=microservices,scope=Namespaced,singular=microservice,shortName=swm,categories=sitewhere-io;core-sitewhere-io
 // +kubebuilder:printcolumn:name="Area",type=string,JSONPath=`.spec.functionalArea`
 
-// SiteWhereMicroservice is the Schema for the sitewheremicroservices API
+// SiteWhereMicroservice is the Schema for the microservices API
 type SiteWhereMicroservice struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

@@ -96,7 +96,14 @@ func (r *SiteWhereMicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Resu
 		var message = fmt.Sprintf("%s Created", msService.GetName())
 		r.Recorder.Event(&swMicroservice, core.EventTypeNormal, "Service", message)
 	}
-
+	swMicroservice.Status.Deployment = msDeployment.GetName()
+	swMicroservice.Status.Services = nil
+	for _, msService := range msServices {
+		swMicroservice.Status.Services = append(swMicroservice.Status.Services, msService.GetName())
+	}
+	if err := r.Status().Update(ctx, &swMicroservice); err != nil {
+		return ctrl.Result{}, err
+	}
 	return ctrl.Result{}, nil
 }
 
