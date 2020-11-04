@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	core "k8s.io/api/core/v1"
@@ -77,20 +78,24 @@ func (r *SiteWhereMicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Resu
 	}
 	r.Recorder.Event(&swMicroservice, core.EventTypeNormal, "Deployment", "Created")
 	// Render the service
-	msService, err := RenderMicroservicesService(msParentInstance, &swMicroservice, msDeployment)
+	msServices, err := RenderMicroservicesService(msParentInstance, &swMicroservice, msDeployment)
 	if err != nil {
-		log.Error(err, "cannot render service for microservice")
+		log.Error(err, "cannot render services for microservice")
 		return ctrl.Result{}, err
 	}
-	// Set ownership
-	ctrl.SetControllerReference(&swMicroservice, msService, r.Scheme)
-	// server side apply, only the fields we set are touched
-	if err := r.Patch(ctx, msService, client.Apply, applyOpts...); err != nil {
-		log.Error(err, "Failed to apply to a service")
-		r.Recorder.Event(&swMicroservice, core.EventTypeWarning, "Service", err.Error())
-		return ctrl.Result{}, err
+
+	for _, msService := range msServices {
+		// Set ownership
+		ctrl.SetControllerReference(&swMicroservice, msService, r.Scheme)
+		// server side apply, only the fields we set are touched
+		if err := r.Patch(ctx, msService, client.Apply, applyOpts...); err != nil {
+			log.Error(err, "Failed to apply to a service")
+			r.Recorder.Event(&swMicroservice, core.EventTypeWarning, "Service", err.Error())
+			return ctrl.Result{}, err
+		}
+		var message = fmt.Sprintf("%s Created", msService.GetName())
+		r.Recorder.Event(&swMicroservice, core.EventTypeNormal, "Service", message)
 	}
-	r.Recorder.Event(&swMicroservice, core.EventTypeNormal, "Service", "Created")
 
 	return ctrl.Result{}, nil
 }

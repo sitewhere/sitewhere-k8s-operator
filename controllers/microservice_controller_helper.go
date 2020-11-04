@@ -49,13 +49,13 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 
 	var labelsSelectorMap = make(map[string]string)
 
+	labelsSelectorMap["app.kubernetes.io/name"] = swMicroservice.GetName()
 	labelsSelectorMap["app.kubernetes.io/instance"] = swInstance.GetName()
-	labelsSelectorMap["app.kubernetes.io/instance"] = swMicroservice.GetName()
 
 	//TODO replace registry, repository and tag for variables of the instance
 	var imageName = fmt.Sprintf("docker.io/sitewhere/service-%s:3.0.0.beta1", swMicroservice.GetName())
 
-	return &appsv1.Deployment{
+	var deployment = &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       deploymentKind,
 			APIVersion: deploymentAPIVersion,
@@ -63,14 +63,7 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      swMicroservice.Name,
 			Namespace: swMicroservice.Namespace,
-			Labels: map[string]string{
-				"app.kubernetes.io/instance":   swInstance.GetName(),
-				"app.kubernetes.io/managed-by": "sitewhere-k8s-operator",
-				"app.kubernetes.io/name":       swInstance.GetName(),
-				"sitewhere.io/instance":        swInstance.GetName(),
-				"sitewhere.io/name":            swMicroservice.GetName(),
-				"sitewhere.io/role":            "microservice",
-			},
+			Labels:    buildObjectMetaLabels(swInstance, swMicroservice),
 		},
 		Spec: appsv1.DeploymentSpec{
 			Replicas: &swMicroservice.Spec.Replicas,
@@ -135,49 +128,86 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 				},
 			},
 		},
-	}, nil
+	}
+
+	// Handle Instance Management special case
+	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
+		deployment.Spec.Template.Spec.Containers[0].Ports = append(deployment.Spec.Template.Spec.Containers[0].Ports,
+			corev1.ContainerPort{
+				ContainerPort: 8080,
+				Protocol:      corev1.ProtocolTCP,
+			})
+	}
+
+	return deployment, nil
 }
 
 //RenderMicroservicesService derives corev1.Service from a SiteWhereMicroservice
 func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice,
-	deploy *appsv1.Deployment) (*corev1.Service, error) {
-	return &corev1.Service{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       serviceKind,
-			APIVersion: serviceAPIVersion,
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      swMicroservice.Name,
-			Namespace: swMicroservice.Namespace,
-			Labels: map[string]string{
-				"app.kubernetes.io/instance":   swInstance.GetName(),
-				"app.kubernetes.io/managed-by": "sitewhere-k8s-operator",
-				"app.kubernetes.io/name":       swInstance.GetName(),
-				"sitewhere.io/instance":        swInstance.GetName(),
-				"sitewhere.io/name":            swMicroservice.GetName(),
-				"sitewhere.io/role":            "microservice",
+	deploy *appsv1.Deployment) ([]*corev1.Service, error) {
+
+	var services = []*corev1.Service{
+		&corev1.Service{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       serviceKind,
+				APIVersion: serviceAPIVersion,
 			},
-		},
-		Spec: corev1.ServiceSpec{
-			Selector: deploy.Spec.Selector.MatchLabels,
-			Type:     corev1.ServiceTypeClusterIP,
-			Ports: []corev1.ServicePort{
-				corev1.ServicePort{
-					Name:       "grpc-api",
-					Port:       9000,
-					Protocol:   corev1.ProtocolTCP,
-					TargetPort: intstr.IntOrString{IntVal: 9000},
-				},
-				corev1.ServicePort{
-					Name:       "http-metrics",
-					Port:       9090,
-					Protocol:   corev1.ProtocolTCP,
-					TargetPort: intstr.IntOrString{IntVal: 9090},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      swMicroservice.Name,
+				Namespace: swMicroservice.Namespace,
+				Labels:    buildObjectMetaLabels(swInstance, swMicroservice),
+			},
+			Spec: corev1.ServiceSpec{
+				Selector: deploy.Spec.Selector.MatchLabels,
+				Type:     corev1.ServiceTypeClusterIP,
+				Ports: []corev1.ServicePort{
+					corev1.ServicePort{
+						Name:       "grpc-api",
+						Port:       9000,
+						Protocol:   corev1.ProtocolTCP,
+						TargetPort: intstr.IntOrString{IntVal: 9000},
+					},
+					corev1.ServicePort{
+						Name:       "http-metrics",
+						Port:       9090,
+						Protocol:   corev1.ProtocolTCP,
+						TargetPort: intstr.IntOrString{IntVal: 9090},
+					},
 				},
 			},
 		},
-	}, nil
+	}
+
+	// Handle Instance Management special case
+	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
+		var service = &corev1.Service{
+			TypeMeta: metav1.TypeMeta{
+				Kind:       serviceKind,
+				APIVersion: serviceAPIVersion,
+			},
+			ObjectMeta: metav1.ObjectMeta{
+				Name:      fmt.Sprintf("%s-rest", swMicroservice.Name),
+				Namespace: swMicroservice.Namespace,
+				Labels:    buildObjectMetaLabels(swInstance, swMicroservice),
+			},
+			Spec: corev1.ServiceSpec{
+				Selector: deploy.Spec.Selector.MatchLabels,
+				Type:     corev1.ServiceTypeLoadBalancer,
+				Ports: []corev1.ServicePort{
+					corev1.ServicePort{
+						Name:       "http-rest",
+						Port:       8080,
+						Protocol:   corev1.ProtocolTCP,
+						TargetPort: intstr.IntOrString{IntVal: 8080},
+					},
+				},
+			},
+		}
+		services = append(services, service)
+	}
+
+	return services, nil
 }
 
 //LocateParentSiteWhereInstance locates the parent SiteWhereInstance of a Microservice
@@ -202,4 +232,17 @@ func LocateParentSiteWhereInstance(ctx context.Context, client client.Client, sw
 		return eventObj, nil
 	}
 	return nil, errors.Errorf(ErrLocateInstance)
+}
+
+func buildObjectMetaLabels(
+	swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) map[string]string {
+	return map[string]string{
+		"app.kubernetes.io/instance":   swInstance.GetName(),
+		"app.kubernetes.io/managed-by": "sitewhere-k8s-operator",
+		"app.kubernetes.io/name":       swMicroservice.GetName(),
+		"sitewhere.io/instance":        swInstance.GetName(),
+		"sitewhere.io/name":            swMicroservice.GetName(),
+		"sitewhere.io/role":            "microservice",
+	}
 }
