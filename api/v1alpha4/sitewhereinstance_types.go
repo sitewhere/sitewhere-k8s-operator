@@ -56,6 +56,10 @@ type SiteWhereInstanceStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=instances,scope=Namespaced,singular=instance,shortName=swi,categories=sitewhere-io;core-sitewhere-io
+// +kubebuilder:printcolumn:name="Config",type=string,JSONPath=`.spec.configurationTemplate`
+// +kubebuilder:printcolumn:name="Dataset",type=string,JSONPath=`.spec.datasetTemplate`
+// +kubebuilder:printcolumn:name="Tenant Mng",type=string,JSONPath=`.status.tenantManagementBootstrapState`
+// +kubebuilder:printcolumn:name="User Mng",type=string,JSONPath=`.status.userManagementBootstrapState`
 
 // SiteWhereInstance is the Schema for the Sitewhere Instances API
 type SiteWhereInstance struct {

@@ -8,6 +8,19 @@ metadata:
   creationTimestamp: null
   name: instances.sitewhere.io
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.configurationTemplate
+    name: Config
+    type: string
+  - JSONPath: .spec.datasetTemplate
+    name: Dataset
+    type: string
+  - JSONPath: .status.tenantManagementBootstrapState
+    name: Tenant Mng
+    type: string
+  - JSONPath: .status.userManagementBootstrapState
+    name: User Mng
+    type: string
   group: sitewhere.io
   names:
     categories:

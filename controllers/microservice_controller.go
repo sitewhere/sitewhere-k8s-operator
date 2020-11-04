@@ -55,7 +55,7 @@ func (r *SiteWhereMicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Resu
 		}
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
-
+	// Render the deployment
 	msParentInstance, err := LocateParentSiteWhereInstance(ctx, r.Client, &swMicroservice)
 	if err != nil {
 		log.Error(err, "cannot locate instance for microservice")
@@ -66,10 +66,8 @@ func (r *SiteWhereMicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Resu
 		log.Error(err, "cannot render deployment for microservice")
 		return ctrl.Result{}, err
 	}
-
 	// Set ownership
 	ctrl.SetControllerReference(&swMicroservice, msDeployment, r.Scheme)
-
 	// server side apply, only the fields we set are touched
 	applyOpts := []client.PatchOption{client.ForceOwnership, client.FieldOwner(swMicroservice.GetUID())}
 	if err := r.Patch(ctx, msDeployment, client.Apply, applyOpts...); err != nil {
@@ -78,6 +76,21 @@ func (r *SiteWhereMicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Resu
 		return ctrl.Result{}, err
 	}
 	r.Recorder.Event(&swMicroservice, core.EventTypeNormal, "Deployment", "Created")
+	// Render the service
+	msService, err := RenderMicroservicesService(msParentInstance, &swMicroservice, msDeployment)
+	if err != nil {
+		log.Error(err, "cannot render service for microservice")
+		return ctrl.Result{}, err
+	}
+	// Set ownership
+	ctrl.SetControllerReference(&swMicroservice, msService, r.Scheme)
+	// server side apply, only the fields we set are touched
+	if err := r.Patch(ctx, msService, client.Apply, applyOpts...); err != nil {
+		log.Error(err, "Failed to apply to a service")
+		r.Recorder.Event(&swMicroservice, core.EventTypeWarning, "Service", err.Error())
+		return ctrl.Result{}, err
+	}
+	r.Recorder.Event(&swMicroservice, core.EventTypeNormal, "Service", "Created")
 
 	return ctrl.Result{}, nil
 }

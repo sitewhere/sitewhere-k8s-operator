@@ -47,6 +47,7 @@ type SiteWhereMicroserviceStatus struct {
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=microservices,scope=Namespaced,singular=microservice,shortName=swm,categories=sitewhere-io;core-sitewhere-io
+// +kubebuilder:printcolumn:name="Area",type=string,JSONPath=`.spec.functionalArea`
 
 // SiteWhereMicroservice is the Schema for the sitewheremicroservices API
 type SiteWhereMicroservice struct {

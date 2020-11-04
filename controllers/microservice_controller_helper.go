@@ -26,6 +26,7 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/api/v1alpha4"
@@ -90,8 +91,89 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 						corev1.Container{
 							Name:  swMicroservice.GetName(),
 							Image: imageName,
+							Ports: []corev1.ContainerPort{
+								corev1.ContainerPort{
+									ContainerPort: 9000,
+									Protocol:      corev1.ProtocolTCP,
+								},
+								corev1.ContainerPort{
+									ContainerPort: 9090,
+									Protocol:      corev1.ProtocolTCP,
+								},
+							},
+							Env: []corev1.EnvVar{
+								corev1.EnvVar{
+									Name: "sitewhere.config.k8s.name",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.name",
+										},
+									},
+								},
+								corev1.EnvVar{
+									Name: "sitewhere.config.k8s.namespace",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "metadata.namespace",
+										},
+									},
+								},
+								corev1.EnvVar{
+									Name: "sitewhere.config.k8s.pod.ip",
+									ValueFrom: &corev1.EnvVarSource{
+										FieldRef: &corev1.ObjectFieldSelector{
+											APIVersion: "v1",
+											FieldPath:  "status.podIP",
+										},
+									},
+								},
+							},
 						},
 					},
+				},
+			},
+		},
+	}, nil
+}
+
+//RenderMicroservicesService derives corev1.Service from a SiteWhereMicroservice
+func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice,
+	deploy *appsv1.Deployment) (*corev1.Service, error) {
+	return &corev1.Service{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       serviceKind,
+			APIVersion: serviceAPIVersion,
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      swMicroservice.Name,
+			Namespace: swMicroservice.Namespace,
+			Labels: map[string]string{
+				"app.kubernetes.io/instance":   swInstance.GetName(),
+				"app.kubernetes.io/managed-by": "sitewhere-k8s-operator",
+				"app.kubernetes.io/name":       swInstance.GetName(),
+				"sitewhere.io/instance":        swInstance.GetName(),
+				"sitewhere.io/name":            swMicroservice.GetName(),
+				"sitewhere.io/role":            "microservice",
+			},
+		},
+		Spec: corev1.ServiceSpec{
+			Selector: deploy.Spec.Selector.MatchLabels,
+			Type:     corev1.ServiceTypeClusterIP,
+			Ports: []corev1.ServicePort{
+				corev1.ServicePort{
+					Name:       "grpc-api",
+					Port:       9000,
+					Protocol:   corev1.ProtocolTCP,
+					TargetPort: intstr.IntOrString{IntVal: 9000},
+				},
+				corev1.ServicePort{
+					Name:       "http-metrics",
+					Port:       9090,
+					Protocol:   corev1.ProtocolTCP,
+					TargetPort: intstr.IntOrString{IntVal: 9090},
 				},
 			},
 		},
