@@ -62,6 +62,11 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 
 	var labelsSelectorMap = buildLabelsSelectors(swInstance, swMicroservice)
 
+	var dockerSpec = defaultDockerSpec
+	if swInstance.Spec.DockerSpec != nil {
+		dockerSpec = swInstance.Spec.DockerSpec
+	}
+
 	var imageName = fmt.Sprintf("%s/%s/service-%s:%s",
 		swInstance.Spec.DockerSpec.Registry,
 		swInstance.Spec.DockerSpec.Repository,

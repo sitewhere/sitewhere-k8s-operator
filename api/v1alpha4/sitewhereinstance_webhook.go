@@ -26,12 +26,6 @@ import (
 // log is for logging in this package.
 var sitewhereinstancelog = logf.Log.WithName("sitewhereinstance-resource")
 
-const (
-	defaultRegistry   string = "docker.io"
-	defaultRepository string = "sitewhere"
-	defaultTag        string = "3.0.0.beta1"
-)
-
 func (r *SiteWhereInstance) SetupWebhookWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewWebhookManagedBy(mgr).
 		For(r).
@@ -49,11 +43,7 @@ func (r *SiteWhereInstance) Default() {
 	sitewhereinstancelog.Info("default", "name", r.Name)
 	if r.Spec.DockerSpec == nil {
 		sitewhereinstancelog.Info("Creating", "DockerSpec", r.Name)
-		r.Spec.DockerSpec = &DockerSpec{
-			Registry:   defaultRegistry,
-			Repository: defaultRepository,
-			Tag:        defaultTag,
-		}
+		r.Spec.DockerSpec = defaultDockerSpec
 	} else {
 		if r.Spec.DockerSpec.Registry == "" {
 			sitewhereinstancelog.Info("Updateing", "DockerSpec.Registry", r.Name)

@@ -37,6 +37,19 @@ const (
 	BootstrapFailed = "BootstrapFailed"
 )
 
+const (
+	defaultRegistry   string = "docker.io"
+	defaultRepository string = "sitewhere"
+	defaultTag        string = "3.0.0.beta1"
+)
+
+// DefaultDockerSpec is th default docker spec
+var DefaultDockerSpec = &DockerSpec{
+	Registry:   defaultRegistry,
+	Repository: defaultRepository,
+	Tag:        defaultTag,
+}
+
 // DockerSpec are the spec to access sitewhere docker images
 type DockerSpec struct {
 	// Registry is the Docker registry
