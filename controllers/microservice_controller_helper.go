@@ -37,6 +37,19 @@ const (
 	ErrLocateInstance = "cannot locate the parent instance"
 )
 
+const (
+	defaultLabelInstance = "app.kubernetes.io/instance"
+	defaultLabelManageBy = "app.kubernetes.io/managed-by"
+	defaultLabelName     = "app.kubernetes.io/name"
+
+	sitewhereLabelInstance = "sitewhere.io/instance"
+	sitewhereLabelName     = "sitewhere.io/name"
+	sitewhereLabelRole     = "sitewhere.io/role"
+
+	labelManagedBySiteWhere = "sitewhere-k8s-operator"
+	labelRoleMicroservice   = "microservice"
+)
+
 var (
 	deploymentKind       = reflect.TypeOf(appsv1.Deployment{}).Name()
 	deploymentAPIVersion = appsv1.SchemeGroupVersion.String()
@@ -47,13 +60,13 @@ var (
 //RenderMicroservicesDeployment derives apps.Deployment from a SiteWhereMicroservice
 func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInstance, swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*appsv1.Deployment, error) {
 
-	var labelsSelectorMap = make(map[string]string)
+	var labelsSelectorMap = buildLabelsSelectors(swInstance, swMicroservice)
 
-	labelsSelectorMap["app.kubernetes.io/name"] = swMicroservice.GetName()
-	labelsSelectorMap["app.kubernetes.io/instance"] = swInstance.GetName()
-
-	//TODO replace registry, repository and tag for variables of the instance
-	var imageName = fmt.Sprintf("docker.io/sitewhere/service-%s:3.0.0.beta1", swMicroservice.GetName())
+	var imageName = fmt.Sprintf("%s/%s/service-%s:%s",
+		swInstance.Spec.DockerSpec.Registry,
+		swInstance.Spec.DockerSpec.Repository,
+		swMicroservice.GetName(),
+		swInstance.Spec.DockerSpec.Tag)
 
 	var deployment = &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -234,15 +247,26 @@ func LocateParentSiteWhereInstance(ctx context.Context, client client.Client, sw
 	return nil, errors.Errorf(ErrLocateInstance)
 }
 
+// buildObjectMetaLabels buils the map of labels for object metadata
 func buildObjectMetaLabels(
 	swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) map[string]string {
 	return map[string]string{
-		"app.kubernetes.io/instance":   swInstance.GetName(),
-		"app.kubernetes.io/managed-by": "sitewhere-k8s-operator",
-		"app.kubernetes.io/name":       swMicroservice.GetName(),
-		"sitewhere.io/instance":        swInstance.GetName(),
-		"sitewhere.io/name":            swMicroservice.GetName(),
-		"sitewhere.io/role":            "microservice",
+		defaultLabelInstance:   swInstance.GetName(),
+		defaultLabelManageBy:   labelManagedBySiteWhere,
+		defaultLabelName:       swMicroservice.GetName(),
+		sitewhereLabelInstance: swInstance.GetName(),
+		sitewhereLabelName:     swMicroservice.GetName(),
+		sitewhereLabelRole:     labelRoleMicroservice,
+	}
+}
+
+// buildLabelsSelectors builds the map for labeles for deployment selector
+func buildLabelsSelectors(
+	swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) map[string]string {
+	return map[string]string{
+		defaultLabelName:     swMicroservice.GetName(),
+		defaultLabelInstance: swInstance.GetName(),
 	}
 }
