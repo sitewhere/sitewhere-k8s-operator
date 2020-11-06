@@ -43,7 +43,7 @@ func (r *SiteWhereInstance) Default() {
 	sitewhereinstancelog.Info("default", "name", r.Name)
 	if r.Spec.DockerSpec == nil {
 		sitewhereinstancelog.Info("Creating", "DockerSpec", r.Name)
-		r.Spec.DockerSpec = defaultDockerSpec
+		r.Spec.DockerSpec = DefaultDockerSpec
 	} else {
 		if r.Spec.DockerSpec.Registry == "" {
 			sitewhereinstancelog.Info("Updateing", "DockerSpec.Registry", r.Name)
