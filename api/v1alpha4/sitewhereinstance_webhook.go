@@ -17,10 +17,16 @@ limitations under the License.
 package v1alpha4
 
 import (
+	"errors"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+)
+
+var (
+	invalidSiteWhereInstanceNames = [...]string{"default", "sitewhere-system", "kube-system", "istio-system"}
 )
 
 // log is for logging in this package.
@@ -68,6 +74,13 @@ var _ webhook.Validator = &SiteWhereInstance{}
 // ValidateCreate implements webhook.Validator so a webhook will be registered for the type
 func (r *SiteWhereInstance) ValidateCreate() error {
 	sitewhereinstancelog.Info("validate create", "name", r.Name)
+
+	// Here we need to validate the name of the SiteWhereInstance, since the Namespace create
+	// should not exists
+	if stringInSlice(r.Name, invalidSiteWhereInstanceNames) {
+		return errors.New("Cluster size must be an odd number")
+
+	}
 	return nil
 }
 
@@ -85,4 +98,13 @@ func (r *SiteWhereInstance) ValidateDelete() error {
 
 	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
+}
+
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
 }

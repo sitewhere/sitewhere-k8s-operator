@@ -17,6 +17,7 @@ limitations under the License.
 package controllers
 
 import (
+	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/api/v1alpha4"
@@ -57,13 +58,13 @@ const (
 )
 
 //RenderMicroservices derives SiteWhereMicroservice from a SiteWhereInstance
-func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*sitewhereiov1alpha4.SiteWhereMicroservice, error) {
+func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance, ns *corev1.Namespace) ([]*sitewhereiov1alpha4.SiteWhereMicroservice, error) {
 
 	var result = []*sitewhereiov1alpha4.SiteWhereMicroservice{
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaAssetManagement,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaAssetManagement,
@@ -76,7 +77,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaBatchOperations,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaBatchOperations,
@@ -89,7 +90,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaCommandDelivery,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaCommandDelivery,
@@ -102,7 +103,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaDeviceManagement,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaDeviceManagement,
@@ -115,7 +116,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaDeviceRegistration,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaDeviceRegistration,
@@ -128,7 +129,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaDeviceState,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaDeviceState,
@@ -141,7 +142,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaEventManagement,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaEventManagement,
@@ -154,7 +155,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaEventSources,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaEventSources,
@@ -167,7 +168,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaInboundProcessing,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaInboundProcessing,
@@ -180,7 +181,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaInstanceManagement,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaInstanceManagement,
@@ -193,7 +194,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaLabelGeneration,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaLabelGeneration,
@@ -206,7 +207,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaOutboundConnectors,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaOutboundConnectors,
@@ -219,7 +220,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
 			ObjectMeta: metav1.ObjectMeta{
 				Name:      FunctionalAreaScheduleManagement,
-				Namespace: swInstance.ObjectMeta.Namespace,
+				Namespace: ns.GetName(),
 			},
 			Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
 				FunctionalArea: FunctionalAreaScheduleManagement,
@@ -232,4 +233,17 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance) ([]*
 	}
 
 	return result, nil
+}
+
+//RenderInstanceNamespace derives a Namespace from the Instance
+func RenderInstanceNamespace(swInstance *sitewhereiov1alpha4.SiteWhereInstance) (*corev1.Namespace, error) {
+	return &corev1.Namespace{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "Namespace",
+			APIVersion: "v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: swInstance.GetName(),
+		},
+	}, nil
 }

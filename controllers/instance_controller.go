@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	core "k8s.io/api/core/v1"
@@ -64,7 +65,22 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 		return ctrl.Result{}, err
 	}
 
-	microservices, err := RenderMicroservices(&swInstance)
+	// Reder Namespace base on the instance's name where the operator will be placing all of it's objectes for the instance.
+	namespace, err := RenderInstanceNamespace(&swInstance)
+	if err != nil {
+		log.Error(err, "can not render microservices from instance")
+		return ctrl.Result{}, err
+	}
+	// Set SiteWhereInstace instance as the owner and controller
+	ctrl.SetControllerReference(&swInstance, namespace, r.Scheme)
+	if err := r.Create(ctx, namespace); err != nil {
+		log.Error(err, "can not create namespace from instance")
+		return ctrl.Result{}, err
+	}
+	var message = fmt.Sprintf("Namespace %s for instance create.", namespace.GetName())
+	r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
+
+	microservices, err := RenderMicroservices(&swInstance, namespace)
 	if err != nil {
 		log.Error(err, "can not render microservices from instance")
 		return ctrl.Result{}, err

@@ -241,8 +241,7 @@ func LocateParentSiteWhereInstance(ctx context.Context, client client.Client, sw
 	}
 	if len(acName) > 0 {
 		nn := types.NamespacedName{
-			Name:      acName,
-			Namespace: swMicroservice.GetNamespace(),
+			Name: acName,
 		}
 		if err := client.Get(ctx, nn, eventObj); err != nil {
 			return nil, err

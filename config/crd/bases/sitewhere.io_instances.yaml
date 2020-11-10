@@ -32,7 +32,7 @@ spec:
     shortNames:
     - swi
     singular: instance
-  scope: Namespaced
+  scope: Cluster
   subresources:
     status: {}
   validation:
@@ -54,6 +54,9 @@ spec:
         spec:
           description: SiteWhereInstanceSpec defines the desired state of SiteWhereInstance
           properties:
+            configuration:
+              description: Configuration is the configuration of the microservice
+              type: string
             configurationTemplate:
               description: ConfigurationTemplate is the name of the configuration
                 template of the instance

@@ -68,6 +68,8 @@ type SiteWhereInstanceSpec struct {
 	DatasetTemplate string `json:"datasetTemplate,omitempty"`
 	// DockerSpec is the
 	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
+	// Configuration is the configuration of the microservice
+	Configuration string `json:"configuration,omitempty"`
 }
 
 // SiteWhereInstanceStatus defines the observed state of SiteWhereInstance
@@ -80,7 +82,7 @@ type SiteWhereInstanceStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=instances,scope=Namespaced,singular=instance,shortName=swi,categories=sitewhere-io;core-sitewhere-io
+// +kubebuilder:resource:path=instances,scope=Cluster,singular=instance,shortName=swi,categories=sitewhere-io;core-sitewhere-io
 // +kubebuilder:printcolumn:name="Config",type=string,JSONPath=`.spec.configurationTemplate`
 // +kubebuilder:printcolumn:name="Dataset",type=string,JSONPath=`.spec.datasetTemplate`
 // +kubebuilder:printcolumn:name="Tenant Mng",type=string,JSONPath=`.status.tenantManagementBootstrapState`
