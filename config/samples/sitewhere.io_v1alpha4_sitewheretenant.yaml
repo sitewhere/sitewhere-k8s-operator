@@ -1,0 +1,12 @@
+apiVersion: sitewhere.io/v1alpha4
+kind: SiteWhereTenant
+metadata:
+  name: sitewheretenant-sample
+spec:
+  name: default
+  authenticationToken: sitewhere0123456789
+  authorizedUserIds:
+    - "admin"
+    - "noadmin"
+  configurationTemplate: default
+  datasetTemplate: default

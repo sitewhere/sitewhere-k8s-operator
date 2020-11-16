@@ -2,4 +2,5 @@
 resources:
 - sitewhere.io_v1alpha4_instance.yaml
 - sitewhere.io_v1alpha4_microservice.yaml
+- sitewhere.io_v1alpha4_sitewheretenantengine.yaml
 # +kubebuilder:scaffold:manifestskustomizesamples

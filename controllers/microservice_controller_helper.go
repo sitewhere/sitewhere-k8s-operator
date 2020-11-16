@@ -42,9 +42,12 @@ const (
 	defaultLabelManageBy = "app.kubernetes.io/managed-by"
 	defaultLabelName     = "app.kubernetes.io/name"
 
-	sitewhereLabelInstance = "sitewhere.io/instance"
-	sitewhereLabelName     = "sitewhere.io/name"
-	sitewhereLabelRole     = "sitewhere.io/role"
+	sitewhereLabelInstance       = "sitewhere.io/instance"
+	sitewhereLabelName           = "sitewhere.io/name"
+	sitewhereLabelRole           = "sitewhere.io/role"
+	sitewhereLabelTenant         = "sitewhere.io/tenant"
+	sitewhereLabelMicroservice   = "sitewhere.io/microservice"
+	sitewhereLabelFunctionalArea = "sitewhere.io/functional-area"
 
 	labelManagedBySiteWhere = "sitewhere-k8s-operator"
 	labelRoleMicroservice   = "microservice"

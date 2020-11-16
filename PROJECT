@@ -8,6 +8,9 @@ resources:
 - group: sitewhere.io
   kind: SiteWhereMicroservice
   version: v1alpha4
+- group: sitewhere.io
+  kind: SiteWhereTenantEngine
+  version: v1alpha4
 version: 3-alpha
 plugins:
   go.sdk.operatorframework.io/v2-alpha: {}

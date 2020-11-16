@@ -36,6 +36,9 @@ type SiteWhereMicroserviceSpec struct {
 
 	// Replicas is the number of desired replicas of the microservice
 	Replicas int32 `json:"replicas,omitempty"`
+
+	// Multitenant indicates whether microservice has tenant engines
+	Multitenant bool `json:"multitenant,omitempty"`
 }
 
 // SiteWhereMicroserviceStatus defines the observed state of SiteWhereMicroservice

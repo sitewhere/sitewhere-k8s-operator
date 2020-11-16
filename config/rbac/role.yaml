@@ -70,3 +70,43 @@ rules:
   - get
   - patch
   - update
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - sitewheretenantengines
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - sitewheretenantengines/status
+  verbs:
+  - get
+  - patch
+  - update
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - sitewheretenants
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - sitewheretenants/status
+  verbs:
+  - get
+  - patch
+  - update

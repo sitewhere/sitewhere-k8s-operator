@@ -91,6 +91,24 @@ func main() {
 			os.Exit(1)
 		}
 	}
+	if err = (&controllers.SiteWhereTenantReconciler{
+		Client:   mgr.GetClient(),
+		Recorder: mgr.GetEventRecorderFor("SiteWhereTenant"),
+		Log:      ctrl.Log.WithName("controllers").WithName("SiteWhereTenant"),
+		Scheme:   mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereTenant")
+		os.Exit(1)
+	}
+	if err = (&controllers.SiteWhereTenantEngineReconciler{
+		Client:   mgr.GetClient(),
+		Recorder: mgr.GetEventRecorderFor("SiteWhereTenantEngine"),
+		Log:      ctrl.Log.WithName("controllers").WithName("SiteWhereTenantEngine"),
+		Scheme:   mgr.GetScheme(),
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereTenantEngine")
+		os.Exit(1)
+	}
 	// +kubebuilder:scaffold:builder
 
 	setupLog.Info("starting manager")

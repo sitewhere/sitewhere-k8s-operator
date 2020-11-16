@@ -77,7 +77,7 @@ func (r *SiteWhereInstance) ValidateCreate() error {
 
 	// Here we need to validate the name of the SiteWhereInstance, since the Namespace create
 	// should not exists
-	if stringInSlice(r.Name, invalidSiteWhereInstanceNames) {
+	if stringInSlice(r.Name, invalidSiteWhereInstanceNames[:]) {
 		return errors.New("Cluster size must be an odd number")
 
 	}
