@@ -17,23 +17,32 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
 	"fmt"
+
+	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/api/v1alpha4"
 )
 
+const (
+	// ErrLocateTenantEngineConfigurationTemplate is the error while locating tenant engine template
+	ErrLocateTenantEngineConfigurationTemplate = "cannot locate the tenant engine template"
+)
+
 //RenderTenantEngine derives SiteWhereTenantEngine from a SiteWhereMicroservice and a SiteWhereTenant
-func RenderTenantEngine(swTenant *sitewhereiov1alpha4.SiteWhereTenant, swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*sitewhereiov1alpha4.SiteWhereTenantEngine, error) {
+func RenderTenantEngine(ctx context.Context, client client.Client, swTenant *sitewhereiov1alpha4.SiteWhereTenant, swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*sitewhereiov1alpha4.SiteWhereTenantEngine, error) {
 	var name = fmt.Sprintf("%s-%s", swTenant.GetName(), swMicroservice.GetName())
 	name = name[:63]
 
-	// Look up tenant configuration template for tenant/microservice combination.
-	// TenantEngineConfigurationTemplate tecTemplate = getTenantEngineConfigurationTemplate(tenant, microservice);
-	// if (tecTemplate == null) {
-	//     throw new SiteWhereK8sException(
-	// 	    String.format("Unable to resolve default tenant engine configuration for '%s'.", functionalArea));
-	// }
+	tecTemplate, err := FindTenantEngineConfigurationTemplate(ctx, client, swTenant, swMicroservice)
+
+	if err != nil {
+		return nil, errors.Errorf(ErrLocateTenantEngineConfigurationTemplate)
+	}
 
 	var tenantEngine *sitewhereiov1alpha4.SiteWhereTenantEngine = &sitewhereiov1alpha4.SiteWhereTenantEngine{
 		ObjectMeta: metav1.ObjectMeta{
@@ -45,6 +54,26 @@ func RenderTenantEngine(swTenant *sitewhereiov1alpha4.SiteWhereTenant, swMicrose
 				sitewhereLabelFunctionalArea: swMicroservice.Spec.FunctionalArea,
 			},
 		},
+		Spec: sitewhereiov1alpha4.SiteWhereTenantEngineSpec{
+			Configuration: tecTemplate.Spec.Configuration,
+		},
 	}
 	return tenantEngine, nil
+}
+
+// FindTenantEngineConfigurationTemplate finds a tenant engine configuration template
+func FindTenantEngineConfigurationTemplate(ctx context.Context,
+	client client.Client,
+	swTenant *sitewhereiov1alpha4.SiteWhereTenant,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*sitewhereiov1alpha4.TenantEngineConfigurationTemplate, error) {
+	var tenantTemplate = &sitewhereiov1alpha4.TenantConfigurationTemplate{}
+	if err := client.Get(ctx, types.NamespacedName{Name: swTenant.Spec.ConfigurationTemplate}, tenantTemplate); err != nil {
+		return nil, err
+	}
+	var name = tenantTemplate.Spec.TenantEngineTemplates[swMicroservice.Spec.FunctionalArea]
+	var tenantEngineTemplate = &sitewhereiov1alpha4.TenantEngineConfigurationTemplate{}
+	if err := client.Get(ctx, types.NamespacedName{Name: name}, tenantEngineTemplate); err != nil {
+		return nil, err
+	}
+	return tenantEngineTemplate, nil
 }

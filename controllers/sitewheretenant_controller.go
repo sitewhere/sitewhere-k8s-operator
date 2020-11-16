@@ -67,7 +67,7 @@ func (r *SiteWhereTenantReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 	for _, swMicroservice := range msList.Items {
 		// Render Tenant Engine from SiteWhereTenant/SiteWhereMicroservice
 		if swMicroservice.Spec.Multitenant {
-			tenantEngine, err := RenderTenantEngine(&swTenant, &swMicroservice)
+			tenantEngine, err := RenderTenantEngine(ctx, r.Client, &swTenant, &swMicroservice)
 			if err != nil {
 				log.Error(err, "can not render tenant engine from tenant and microservice")
 				return ctrl.Result{}, err
