@@ -2,10 +2,12 @@
 # since it depends on service name and namespace that are out of this kustomize package.
 # It should be run by config/default
 resources:
-  - bases/sitewhere.io_instances.yaml
-  - bases/sitewhere.io_microservices.yaml
-  - bases/sitewhere.io_sitewheretenants.yaml
+- bases/sitewhere.io_instances.yaml
+- bases/sitewhere.io_microservices.yaml
+- bases/sitewhere.io_sitewheretenants.yaml
 - bases/sitewhere.io_sitewheretenantengines.yaml
+- bases/sitewhere.io_tenantengineconfigurationtemplates.yaml
+- bases/sitewhere.io_tenantconfigurationtemplates.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:
@@ -15,6 +17,8 @@ patchesStrategicMerge:
 #- patches/webhook_in_microservices.yaml
 #- patches/webhook_in_sitewheretenants.yaml
 #- patches/webhook_in_sitewheretenantengines.yaml
+#- patches/webhook_in_tenantengineconfigurationtemplates.yaml
+#- patches/webhook_in_tenantconfigurationtemplates.yaml
 # +kubebuilder:scaffold:crdkustomizewebhookpatch
 
 # [CERTMANAGER] To enable webhook, uncomment all the sections with [CERTMANAGER] prefix.
@@ -23,6 +27,8 @@ patchesStrategicMerge:
 #- patches/cainjection_in_microservices.yaml
 #- patches/cainjection_in_sitewheretenants.yaml
 #- patches/cainjection_in_sitewheretenantengines.yaml
+#- patches/cainjection_in_tenantengineconfigurationtemplates.yaml
+#- patches/cainjection_in_tenantconfigurationtemplates.yaml
 # +kubebuilder:scaffold:crdkustomizecainjectionpatch
 
 # the following config is for teaching kustomize how to do kustomization for CRDs.

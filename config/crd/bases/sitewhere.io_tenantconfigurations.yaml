@@ -6,29 +6,26 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.3.0
   creationTimestamp: null
-  name: microservices.sitewhere.io
+  name: tenantconfigurations.sitewhere.io
 spec:
-  additionalPrinterColumns:
-  - JSONPath: .spec.functionalArea
-    name: Area
-    type: string
   group: sitewhere.io
   names:
     categories:
     - sitewhere-io
     - core-sitewhere-io
-    kind: SiteWhereMicroservice
-    listKind: SiteWhereMicroserviceList
-    plural: microservices
+    kind: TenantConfigurationTemplate
+    listKind: TenantConfigurationTemplateList
+    plural: tenantconfigurations
     shortNames:
-    - swm
-    singular: microservice
-  scope: Namespaced
+    - tct
+    singular: tenantconfiguration
+  scope: Cluster
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: SiteWhereMicroservice is the Schema for the microservices API
+      description: TenantConfigurationTemplate is the Schema for the tenantconfigurationtemplates
+        API
       properties:
         apiVersion:
           description: 'APIVersion defines the versioned schema of this representation
@@ -43,39 +40,25 @@ spec:
         metadata:
           type: object
         spec:
-          description: SiteWhereMicroserviceSpec defines the desired state of SiteWhereMicroservice
+          description: TenantConfigurationTemplateSpec defines the desired state of
+            TenantConfigurationTemplate
           properties:
             description:
-              description: Description is the description of the microservice
+              description: Description is the name of the tenant configuration template
               type: string
-            functionalArea:
-              description: Functional Area
-              type: string
-            icon:
-              description: Icon displayed for microservice
-              type: string
-            multitenant:
-              description: Multitenant indicates whether microservice has tenant engines
-              type: boolean
             name:
-              description: Name is the name displayed for microservice
+              description: Name is the name of the tenant configuration template
               type: string
-            replicas:
-              description: Replicas is the number of desired replicas of the microservice
-              format: int32
-              type: integer
+            tenantEngineTemplates:
+              additionalProperties:
+                type: string
+              description: TenantEngineTemplates is the name of the tenant configuration
+                template
+              type: object
           type: object
         status:
-          description: SiteWhereMicroserviceStatus defines the observed state of SiteWhereMicroservice
-          properties:
-            deployment:
-              description: Deployment name of the deployment
-              type: string
-            services:
-              description: Services name of services
-              items:
-                type: string
-              type: array
+          description: TenantConfigurationTemplateStatus defines the observed state
+            of TenantConfigurationTemplate
           type: object
       type: object
   version: v1alpha4
