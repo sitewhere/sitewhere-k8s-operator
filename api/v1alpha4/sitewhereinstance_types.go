@@ -18,6 +18,7 @@ package v1alpha4
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // BootstrapState State values for bootstrapping a component.
@@ -69,7 +70,7 @@ type SiteWhereInstanceSpec struct {
 	// DockerSpec is the
 	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
 	// Configuration is the configuration of the microservice
-	Configuration string `json:"configuration,omitempty"`
+	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
 
 // SiteWhereInstanceStatus defines the observed state of SiteWhereInstance

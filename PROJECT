@@ -17,6 +17,9 @@ resources:
 - group: sitewhere.io
   kind: TenantConfigurationTemplate
   version: v1alpha4
+- group: sitewhere.io
+  kind: InstanceConfigurationTemplate
+  version: v1alpha4
 version: 3-alpha
 plugins:
   go.sdk.operatorframework.io/v2-alpha: {}

@@ -44,7 +44,7 @@ spec:
           properties:
             configuration:
               description: Configuration is the configuration for the tenant
-              type: string
+              type: object
           type: object
         status:
           description: SiteWhereTenantEngineStatus defines the observed state of SiteWhereTenantEngine

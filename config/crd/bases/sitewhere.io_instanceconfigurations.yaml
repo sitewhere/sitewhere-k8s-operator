@@ -6,25 +6,25 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.3.0
   creationTimestamp: null
-  name: tenantengineconfigurations.sitewhere.io
+  name: instanceconfigurations.sitewhere.io
 spec:
   group: sitewhere.io
   names:
     categories:
     - sitewhere-io
     - core-sitewhere-io
-    kind: TenantEngineConfigurationTemplate
-    listKind: TenantEngineConfigurationTemplateList
-    plural: tenantengineconfigurations
+    kind: InstanceConfigurationTemplate
+    listKind: InstanceConfigurationTemplateList
+    plural: instanceconfigurations
     shortNames:
-    - tect
-    singular: tenantengineconfiguration
+    - ict
+    singular: instanceconfiguration
   scope: Cluster
   subresources:
     status: {}
   validation:
     openAPIV3Schema:
-      description: TenantEngineConfigurationTemplate is the Schema for the tenantengineconfigurationtemplates
+      description: InstanceConfigurationTemplate is the Schema for the instanceconfigurationtemplates
         API
       properties:
         apiVersion:
@@ -40,16 +40,16 @@ spec:
         metadata:
           type: object
         spec:
-          description: TenantEngineConfigurationTemplateSpec defines the desired state
-            of TenantEngineConfigurationTemplate
+          description: InstanceConfigurationTemplateSpec defines the desired state
+            of InstanceConfigurationTemplate
           properties:
             configuration:
               description: Configuration is the configuration for the tenant
               type: object
           type: object
         status:
-          description: TenantEngineConfigurationTemplateStatus defines the observed
-            state of TenantEngineConfigurationTemplate
+          description: InstanceConfigurationTemplateStatus defines the observed state
+            of InstanceConfigurationTemplate
           type: object
       type: object
   version: v1alpha4

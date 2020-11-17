@@ -18,12 +18,13 @@ package v1alpha4
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
 // TenantEngineConfigurationTemplateSpec defines the desired state of TenantEngineConfigurationTemplate
 type TenantEngineConfigurationTemplateSpec struct {
 	// Configuration is the configuration for the tenant
-	Configuration string `json:"configuration,omitempty"`
+	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
 
 // TenantEngineConfigurationTemplateStatus defines the observed state of TenantEngineConfigurationTemplate

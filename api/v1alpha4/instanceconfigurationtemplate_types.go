@@ -21,40 +21,38 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 )
 
-// SiteWhereTenantEngineSpec defines the desired state of SiteWhereTenantEngine
-type SiteWhereTenantEngineSpec struct {
+// InstanceConfigurationTemplateSpec defines the desired state of InstanceConfigurationTemplate
+type InstanceConfigurationTemplateSpec struct {
 	// Configuration is the configuration for the tenant
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
 
-// SiteWhereTenantEngineStatus defines the observed state of SiteWhereTenantEngine
-type SiteWhereTenantEngineStatus struct {
-	// BootstrapState is the bootstrap state of the tenant engine
-	BootstrapState BootstrapState `json:"bootstrapState,omitempty"`
+// InstanceConfigurationTemplateStatus defines the observed state of InstanceConfigurationTemplate
+type InstanceConfigurationTemplateStatus struct {
 }
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-// +kubebuilder:resource:path=tenantengines,scope=Namespaced,singular=tenantengine,shortName=swte,categories=sitewhere-io;core-sitewhere-io
+// +kubebuilder:resource:path=instanceconfigurations,scope=Cluster,singular=instanceconfiguration,shortName=ict,categories=sitewhere-io;core-sitewhere-io
 
-// SiteWhereTenantEngine is the Schema for the sitewheretenantengines API
-type SiteWhereTenantEngine struct {
+// InstanceConfigurationTemplate is the Schema for the instanceconfigurationtemplates API
+type InstanceConfigurationTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
-	Spec   SiteWhereTenantEngineSpec   `json:"spec,omitempty"`
-	Status SiteWhereTenantEngineStatus `json:"status,omitempty"`
+	Spec   InstanceConfigurationTemplateSpec   `json:"spec,omitempty"`
+	Status InstanceConfigurationTemplateStatus `json:"status,omitempty"`
 }
 
 // +kubebuilder:object:root=true
 
-// SiteWhereTenantEngineList contains a list of SiteWhereTenantEngine
-type SiteWhereTenantEngineList struct {
+// InstanceConfigurationTemplateList contains a list of InstanceConfigurationTemplate
+type InstanceConfigurationTemplateList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
-	Items           []SiteWhereTenantEngine `json:"items"`
+	Items           []InstanceConfigurationTemplate `json:"items"`
 }
 
 func init() {
-	SchemeBuilder.Register(&SiteWhereTenantEngine{}, &SiteWhereTenantEngineList{})
+	SchemeBuilder.Register(&InstanceConfigurationTemplate{}, &InstanceConfigurationTemplateList{})
 }

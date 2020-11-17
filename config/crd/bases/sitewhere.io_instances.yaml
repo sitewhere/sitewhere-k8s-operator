@@ -56,7 +56,7 @@ spec:
           properties:
             configuration:
               description: Configuration is the configuration of the microservice
-              type: string
+              type: object
             configurationTemplate:
               description: ConfigurationTemplate is the name of the configuration
                 template of the instance

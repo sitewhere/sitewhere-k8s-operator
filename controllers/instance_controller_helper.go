@@ -17,8 +17,12 @@ limitations under the License.
 package controllers
 
 import (
+	"context"
+
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/api/v1alpha4"
 )
@@ -259,4 +263,14 @@ func RenderInstanceNamespace(swInstance *sitewhereiov1alpha4.SiteWhereInstance) 
 			Name: swInstance.GetName(),
 		},
 	}, nil
+}
+
+// FindInstanceConfigurationTemplate retrieves a InstanceConfigurationTemplate
+func FindInstanceConfigurationTemplate(ctx context.Context,
+	client client.Client, name string) (*sitewhereiov1alpha4.InstanceConfigurationTemplate, error) {
+	var intanceConfigTemplate = &sitewhereiov1alpha4.InstanceConfigurationTemplate{}
+	if err := client.Get(ctx, types.NamespacedName{Name: name}, intanceConfigTemplate); err != nil {
+		return nil, err
+	}
+	return intanceConfigTemplate, nil
 }

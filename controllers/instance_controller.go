@@ -74,11 +74,32 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 	// Set SiteWhereInstace instance as the owner and controller
 	ctrl.SetControllerReference(&swInstance, namespace, r.Scheme)
 	if err := r.Create(ctx, namespace); err != nil {
-		log.Error(err, "can not create namespace from instance")
-		return ctrl.Result{}, err
+		if apierrors.IsAlreadyExists(err) {
+			log.Info(fmt.Sprintf("Namespace %s already exists", namespace.GetName()))
+		} else {
+			log.Error(err, "can not create namespace from instance")
+			return ctrl.Result{}, err
+		}
+	} else {
+		var message = fmt.Sprintf("Namespace %s for instance create.", namespace.GetName())
+		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
 	}
-	var message = fmt.Sprintf("Namespace %s for instance create.", namespace.GetName())
-	r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
+
+	// If we don't have configuration, copy from InstanceConfigurationTemplate
+	if swInstance.Spec.Configuration == nil {
+		instanceConfigurationTemplate, err := FindInstanceConfigurationTemplate(ctx, r.Client, swInstance.Spec.ConfigurationTemplate)
+		if err != nil {
+			log.Error(err, fmt.Sprintf("can not find instance configuration template %s", swInstance.Spec.ConfigurationTemplate))
+			return ctrl.Result{}, err
+		}
+		swInstance.Spec.Configuration = instanceConfigurationTemplate.Spec.Configuration.DeepCopy()
+		if err := r.Update(context.Background(), &swInstance); err != nil {
+			log.Error(err, "Failed to update SiteWhereInstance")
+			r.Recorder.Event(&swInstance, core.EventTypeWarning, "Configuration", err.Error())
+			return ctrl.Result{}, err
+		}
+		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Configuration", "Updated")
+	}
 
 	microservices, err := RenderMicroservices(&swInstance, namespace)
 	if err != nil {

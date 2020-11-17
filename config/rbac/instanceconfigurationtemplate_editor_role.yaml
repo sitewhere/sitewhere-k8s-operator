@@ -1,0 +1,24 @@
+# permissions for end users to edit instanceconfigurationtemplates.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: instanceconfigurationtemplate-editor-role
+rules:
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - instanceconfigurationtemplates
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - instanceconfigurationtemplates/status
+  verbs:
+  - get
