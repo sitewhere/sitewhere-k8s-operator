@@ -23,7 +23,6 @@ import (
 	core "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -57,7 +56,7 @@ func (r *SiteWhereTenantReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 	r.Recorder.Event(&swTenant, core.EventTypeNormal, "Updated", "Bootstraping")
 
 	var msList sitewhereiov1alpha4.SiteWhereMicroserviceList
-	if err := r.Get(ctx, types.NamespacedName{Namespace: req.NamespacedName.Namespace}, &msList); err != nil {
+	if err := r.List(ctx, &msList, client.InNamespace(req.NamespacedName.Namespace)); err != nil {
 		if apierrors.IsNotFound(err) {
 			log.Info("No Microservices found in namespace")
 		}

@@ -1,7 +1,8 @@
 apiVersion: sitewhere.io/v1alpha4
 kind: SiteWhereTenant
 metadata:
-  name: sitewheretenant-sample
+  name: default
+  namespace: sitewhere
 spec:
   name: default
   authenticationToken: sitewhere0123456789

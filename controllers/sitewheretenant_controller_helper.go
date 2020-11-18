@@ -36,7 +36,7 @@ const (
 //RenderTenantEngine derives SiteWhereTenantEngine from a SiteWhereMicroservice and a SiteWhereTenant
 func RenderTenantEngine(ctx context.Context, client client.Client, swTenant *sitewhereiov1alpha4.SiteWhereTenant, swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*sitewhereiov1alpha4.SiteWhereTenantEngine, error) {
 	var name = fmt.Sprintf("%s-%s", swTenant.GetName(), swMicroservice.GetName())
-	name = name[:63]
+	//name = name[:63]
 
 	tecTemplate, err := FindTenantEngineConfigurationTemplate(ctx, client, swTenant, swMicroservice)
 
