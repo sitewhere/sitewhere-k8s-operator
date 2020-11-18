@@ -6,9 +6,9 @@ resources:
 - bases/sitewhere.io_microservices.yaml
 - bases/sitewhere.io_tenants.yaml
 - bases/sitewhere.io_tenantengines.yaml
-- bases/sitewhere.io_tenantengineconfigurations.yaml
-- bases/sitewhere.io_tenantconfigurations.yaml
-- bases/sitewhere.io_instanceconfigurations.yaml
+- bases/templates.sitewhere.io_instanceconfigurations.yaml
+- bases/templates.sitewhere.io_tenantconfigurations.yaml
+- bases/templates.sitewhere.io_tenantengineconfigurations.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
 patchesStrategicMerge:

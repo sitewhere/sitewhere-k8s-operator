@@ -1,4 +1,4 @@
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-asset-management
@@ -9,7 +9,7 @@ spec:
     datastore:
       reference: postgres
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-batch-operations
@@ -22,7 +22,7 @@ spec:
     batchOperationManager:
       throttleDelayMs: 100
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-command-delivery
@@ -47,7 +47,7 @@ spec:
           hostname: sitewhere-infrastructure-mosquitto.sitewhere-system
           port: 1883
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-device-management
@@ -58,7 +58,7 @@ spec:
     datastore:
       reference: postgres
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-device-state
@@ -69,7 +69,7 @@ spec:
     datastore:
       reference: postgres
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-event-management
@@ -80,7 +80,7 @@ spec:
     datastore:
       reference: influxdb
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-event-search
@@ -90,7 +90,7 @@ spec:
   configuration:
     foo: "bar"
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-event-sources
@@ -120,7 +120,7 @@ spec:
           topic: SiteWhere/${tenant.token}/input/protobuf
           numThreads: 3
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-inbound-processing
@@ -130,7 +130,7 @@ spec:
   configuration:
     processingThreadCount: 10
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-label-generation
@@ -149,7 +149,7 @@ spec:
           foregroundColor: 333333ff
           backgroundColor: ffffffff
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-outbound-connectors
@@ -165,7 +165,7 @@ spec:
           port: 1883
           topic: SiteWhere/${tenant.token}/output/mqtt
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-schedule-management
@@ -176,7 +176,7 @@ spec:
     datastore:
       reference: postgres
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-streaming-media
@@ -186,7 +186,7 @@ spec:
   configuration: 
     foo: "bar"
 ---
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: TenantEngineConfigurationTemplate
 metadata:
   name: default-device-registration

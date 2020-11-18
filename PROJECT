@@ -1,4 +1,5 @@
 layout: go.kubebuilder.io/v2
+multigroup: true
 projectName: sitewhere-k8s-operator
 repo: github.com/sitewhere/sitewhere-k8s-operator
 resources:
@@ -11,13 +12,13 @@ resources:
 - group: sitewhere.io
   kind: SiteWhereTenantEngine
   version: v1alpha4
-- group: sitewhere.io
+- group: templates.sitewhere.io
   kind: TenantEngineConfigurationTemplate
   version: v1alpha4
-- group: sitewhere.io
+- group: templates.sitewhere.io
   kind: TenantConfigurationTemplate
   version: v1alpha4
-- group: sitewhere.io
+- group: templates.sitewhere.io
   kind: InstanceConfigurationTemplate
   version: v1alpha4
 version: 3-alpha

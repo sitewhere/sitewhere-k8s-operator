@@ -24,7 +24,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/api/v1alpha4"
+	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
+	templatesv1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
 )
 
 const (
@@ -267,8 +268,8 @@ func RenderInstanceNamespace(swInstance *sitewhereiov1alpha4.SiteWhereInstance) 
 
 // FindInstanceConfigurationTemplate retrieves a InstanceConfigurationTemplate
 func FindInstanceConfigurationTemplate(ctx context.Context,
-	client client.Client, name string) (*sitewhereiov1alpha4.InstanceConfigurationTemplate, error) {
-	var intanceConfigTemplate = &sitewhereiov1alpha4.InstanceConfigurationTemplate{}
+	client client.Client, name string) (*templatesv1alpha4.InstanceConfigurationTemplate, error) {
+	var intanceConfigTemplate = &templatesv1alpha4.InstanceConfigurationTemplate{}
 	if err := client.Get(ctx, types.NamespacedName{Name: name}, intanceConfigTemplate); err != nil {
 		return nil, err
 	}

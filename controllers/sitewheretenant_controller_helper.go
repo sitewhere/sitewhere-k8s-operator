@@ -26,7 +26,8 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/api/v1alpha4"
+	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
+	templatesv1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
 )
 
 const (
@@ -66,8 +67,8 @@ func RenderTenantEngine(ctx context.Context, client client.Client, swTenant *sit
 func FindTenantEngineConfigurationTemplate(ctx context.Context,
 	client client.Client,
 	swTenant *sitewhereiov1alpha4.SiteWhereTenant,
-	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*sitewhereiov1alpha4.TenantEngineConfigurationTemplate, error) {
-	var tenantTemplate = &sitewhereiov1alpha4.TenantConfigurationTemplate{}
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*templatesv1alpha4.TenantEngineConfigurationTemplate, error) {
+	var tenantTemplate = &templatesv1alpha4.TenantConfigurationTemplate{}
 	if err := client.Get(ctx, types.NamespacedName{Name: swTenant.Spec.ConfigurationTemplate}, tenantTemplate); err != nil {
 		return nil, err
 	}
@@ -75,7 +76,7 @@ func FindTenantEngineConfigurationTemplate(ctx context.Context,
 	var key = strcase.ToLowerCamel(swMicroservice.Spec.FunctionalArea)
 	var name = tenantTemplate.Spec.TenantEngineTemplates[key]
 
-	var tenantEngineTemplate = &sitewhereiov1alpha4.TenantEngineConfigurationTemplate{}
+	var tenantEngineTemplate = &templatesv1alpha4.TenantEngineConfigurationTemplate{}
 	if err := client.Get(ctx, types.NamespacedName{Name: name}, tenantEngineTemplate); err != nil {
 		return nil, err
 	}

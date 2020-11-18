@@ -1,4 +1,4 @@
-apiVersion: sitewhere.io/v1alpha4
+apiVersion: templates.sitewhere.io/v1alpha4
 kind: InstanceConfigurationTemplate
 metadata:
   name: default
