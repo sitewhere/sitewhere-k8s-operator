@@ -20,6 +20,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/iancoleman/strcase"
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
@@ -70,7 +71,10 @@ func FindTenantEngineConfigurationTemplate(ctx context.Context,
 	if err := client.Get(ctx, types.NamespacedName{Name: swTenant.Spec.ConfigurationTemplate}, tenantTemplate); err != nil {
 		return nil, err
 	}
-	var name = tenantTemplate.Spec.TenantEngineTemplates[swMicroservice.Spec.FunctionalArea]
+
+	var key = strcase.ToLowerCamel(swMicroservice.Spec.FunctionalArea)
+	var name = tenantTemplate.Spec.TenantEngineTemplates[key]
+
 	var tenantEngineTemplate = &sitewhereiov1alpha4.TenantEngineConfigurationTemplate{}
 	if err := client.Get(ctx, types.NamespacedName{Name: name}, tenantEngineTemplate); err != nil {
 		return nil, err
