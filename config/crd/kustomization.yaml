@@ -7,7 +7,6 @@ resources:
 - bases/sitewhere.io_tenants.yaml
 - bases/sitewhere.io_tenantengines.yaml
 - bases/sitewhere.io_tenantengineconfigurations.yaml
-- bases/sitewhere.io_tenantconfigurationtemplates.yaml
 - bases/sitewhere.io_instanceconfigurations.yaml
 # +kubebuilder:scaffold:crdkustomizeresource
 
