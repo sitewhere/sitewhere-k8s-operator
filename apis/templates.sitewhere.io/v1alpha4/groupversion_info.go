@@ -20,7 +20,7 @@ limitations under the License.
 package v1alpha4
 
 import (
-	//"reflect"
+	"reflect"
 
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"sigs.k8s.io/controller-runtime/pkg/scheme"
@@ -43,10 +43,26 @@ var (
 	AddToScheme = SchemeBuilder.AddToScheme
 )
 
-// // SiteWhereInstance type metadata.
-// var (
-// 	SiteWhereInstanceKind             = reflect.TypeOf(SiteWhereInstance{}).Name()
-// 	SiteWhereInstanceGroupKind        = schema.GroupKind{Group: Group, Kind: SiteWhereInstanceKind}.String()
-// 	SiteWhereInstanceKindAPIVersion   = SiteWhereInstanceKind + "." + GroupVersion.String()
-// 	SiteWhereInstanceGroupVersionKind = GroupVersion.WithKind(SiteWhereInstanceKind)
-// )
+// InstanceConfigurationTemplate type metadata.
+var (
+	InstanceConfigurationTemplateKind             = reflect.TypeOf(InstanceConfigurationTemplate{}).Name()
+	InstanceConfigurationTemplateGroupKind        = schema.GroupKind{Group: Group, Kind: InstanceConfigurationTemplateKind}.String()
+	InstanceConfigurationTemplateKindAPIVersion   = InstanceConfigurationTemplateKind + "." + GroupVersion.String()
+	InstanceConfigurationTemplateGroupVersionKind = GroupVersion.WithKind(InstanceConfigurationTemplateKind)
+)
+
+// TenantConfigurationTemplate type metadata.
+var (
+	TenantConfigurationTemplateKind             = reflect.TypeOf(TenantConfigurationTemplate{}).Name()
+	TenantConfigurationTemplateGroupKind        = schema.GroupKind{Group: Group, Kind: TenantConfigurationTemplateKind}.String()
+	TenantConfigurationTemplateKindAPIVersion   = TenantConfigurationTemplateKind + "." + GroupVersion.String()
+	TenantConfigurationTemplateGroupVersionKind = GroupVersion.WithKind(TenantConfigurationTemplateKind)
+)
+
+// TenantEngineConfigurationTemplate type metadata.
+var (
+	TenantEngineConfigurationTemplateKind             = reflect.TypeOf(TenantEngineConfigurationTemplate{}).Name()
+	TenantEngineConfigurationTemplateGroupKind        = schema.GroupKind{Group: Group, Kind: TenantEngineConfigurationTemplateKind}.String()
+	TenantEngineConfigurationTemplateKindAPIVersion   = TenantEngineConfigurationTemplateKind + "." + GroupVersion.String()
+	TenantEngineConfigurationTemplateGroupVersionKind = GroupVersion.WithKind(TenantEngineConfigurationTemplateKind)
+)

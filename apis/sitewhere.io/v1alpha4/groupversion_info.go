@@ -50,3 +50,27 @@ var (
 	SiteWhereInstanceKindAPIVersion   = SiteWhereInstanceKind + "." + GroupVersion.String()
 	SiteWhereInstanceGroupVersionKind = GroupVersion.WithKind(SiteWhereInstanceKind)
 )
+
+// SiteWhereMicroservice type metadata.
+var (
+	SiteWhereMicroserviceKind             = reflect.TypeOf(SiteWhereMicroservice{}).Name()
+	SiteWhereMicroserviceGroupKind        = schema.GroupKind{Group: Group, Kind: SiteWhereMicroserviceKind}.String()
+	SiteWhereMicroserviceKindAPIVersion   = SiteWhereMicroserviceKind + "." + GroupVersion.String()
+	SiteWhereMicroserviceGroupVersionKind = GroupVersion.WithKind(SiteWhereMicroserviceKind)
+)
+
+// SiteWhereTenant type metadata.
+var (
+	SiteWhereTenantKind             = reflect.TypeOf(SiteWhereTenant{}).Name()
+	SiteWhereTenantGroupKind        = schema.GroupKind{Group: Group, Kind: SiteWhereTenantKind}.String()
+	SiteWhereTenantKindAPIVersion   = SiteWhereTenantKind + "." + GroupVersion.String()
+	SiteWhereTenantGroupVersionKind = GroupVersion.WithKind(SiteWhereTenantKind)
+)
+
+// SiteWhereTenantEngine type metadata.
+var (
+	SiteWhereTenantEngineKind             = reflect.TypeOf(SiteWhereTenantEngine{}).Name()
+	SiteWhereTenantEngineGroupKind        = schema.GroupKind{Group: Group, Kind: SiteWhereTenantEngineKind}.String()
+	SiteWhereTenantEngineKindAPIVersion   = SiteWhereTenantEngineKind + "." + GroupVersion.String()
+	SiteWhereTenantEngineGroupVersionKind = GroupVersion.WithKind(SiteWhereTenantEngineKind)
+)

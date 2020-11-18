@@ -101,6 +101,7 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 					},
 				},
 				Spec: corev1.PodSpec{
+					ServiceAccountName: swInstance.GetName(),
 					Containers: []corev1.Container{
 						corev1.Container{
 							Name:  swMicroservice.GetName(),

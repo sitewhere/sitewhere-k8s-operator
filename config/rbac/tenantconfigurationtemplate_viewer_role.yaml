@@ -5,7 +5,7 @@ metadata:
   name: tenantconfigurationtemplate-viewer-role
 rules:
 - apiGroups:
-  - sitewhere.io
+  - templates.sitewhere.io
   resources:
   - tenantconfigurationtemplates
   verbs:
@@ -13,7 +13,7 @@ rules:
   - list
   - watch
 - apiGroups:
-  - sitewhere.io
+  - templates.sitewhere.io
   resources:
   - tenantconfigurationtemplates/status
   verbs:

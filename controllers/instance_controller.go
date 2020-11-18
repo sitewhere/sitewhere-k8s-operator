@@ -81,7 +81,27 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 			return ctrl.Result{}, err
 		}
 	} else {
-		var message = fmt.Sprintf("Namespace %s for instance create.", namespace.GetName())
+		var message = fmt.Sprintf("Namespace %s for instance created.", namespace.GetName())
+		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
+	}
+
+	// Render the service account
+	msServiceAccount, err := RenderMicroservicesServiceAccount(&swInstance, namespace)
+	if err != nil {
+		log.Error(err, "cannot render service account for instace")
+		return ctrl.Result{}, err
+	}
+	// Set ownership
+	ctrl.SetControllerReference(&swInstance, msServiceAccount, r.Scheme)
+	if err := r.Create(ctx, msServiceAccount); err != nil {
+		if apierrors.IsAlreadyExists(err) {
+			log.Info(fmt.Sprintf("ServiceAccount %s already exists", msServiceAccount.GetName()))
+		} else {
+			log.Error(err, "can not create ServiceAccount from instance")
+			return ctrl.Result{}, err
+		}
+	} else {
+		var message = fmt.Sprintf("ServiceAccount %s for instance created.", msServiceAccount.GetName())
 		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
 	}
 

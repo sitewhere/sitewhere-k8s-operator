@@ -5,7 +5,7 @@ metadata:
   name: tenantengineconfigurationtemplate-editor-role
 rules:
 - apiGroups:
-  - sitewhere.io
+  - templates.sitewhere.io
   resources:
   - tenantengineconfigurationtemplates
   verbs:
@@ -17,7 +17,7 @@ rules:
   - update
   - watch
 - apiGroups:
-  - sitewhere.io
+  - templates.sitewhere.io
   resources:
   - tenantengineconfigurationtemplates/status
   verbs:

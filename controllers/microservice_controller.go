@@ -56,12 +56,15 @@ func (r *SiteWhereMicroserviceReconciler) Reconcile(req ctrl.Request) (ctrl.Resu
 		}
 		return ctrl.Result{}, client.IgnoreNotFound(err)
 	}
-	// Render the deployment
+	// Look up parent instance
 	msParentInstance, err := LocateParentSiteWhereInstance(ctx, r.Client, &swMicroservice)
 	if err != nil {
 		log.Error(err, "cannot locate instance for microservice")
 		return ctrl.Result{}, err
 	}
+
+	// TODO Add SA, Role, RoleBindings for deployment
+	// Render the deployment
 	msDeployment, err := RenderMicroservicesDeployment(msParentInstance, &swMicroservice)
 	if err != nil {
 		log.Error(err, "cannot render deployment for microservice")
