@@ -23,6 +23,8 @@ import (
 
 // TenantEngineConfigurationTemplateSpec defines the desired state of TenantEngineConfigurationTemplate
 type TenantEngineConfigurationTemplateSpec struct {
+	// +nullable
+
 	// Configuration is the configuration for the tenant
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }

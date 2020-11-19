@@ -23,6 +23,8 @@ import (
 
 // InstanceConfigurationTemplateSpec defines the desired state of InstanceConfigurationTemplate
 type InstanceConfigurationTemplateSpec struct {
+	// +nullable
+
 	// Configuration is the configuration for the tenant
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
