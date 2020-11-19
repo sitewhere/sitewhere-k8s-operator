@@ -27,6 +27,7 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	scriptingsitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/scripting.sitewhere.io/v1alpha4"
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
 	templatessitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
 	"github.com/sitewhere/sitewhere-k8s-operator/controllers"
@@ -43,6 +44,7 @@ func init() {
 
 	utilruntime.Must(sitewhereiov1alpha4.AddToScheme(scheme))
 	utilruntime.Must(templatessitewhereiov1alpha4.AddToScheme(scheme))
+	utilruntime.Must(scriptingsitewhereiov1alpha4.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
