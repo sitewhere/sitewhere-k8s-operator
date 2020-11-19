@@ -24,6 +24,9 @@ resources:
 - group: templates.sitewhere.io
   kind: InstanceDatasetTemplate
   version: v1alpha4
+- group: templates.sitewhere.io
+  kind: TenantDatasetTemplate
+  version: v1alpha4
 version: 3-alpha
 plugins:
   go.sdk.operatorframework.io/v2-alpha: {}
