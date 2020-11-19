@@ -11,4 +11,5 @@ resources:
 - templates.sitewhere.io_v1alpha4_tenantenginedatasettemplate.yaml
 - scripting.sitewhere.io_v1alpha4_sitewherescriptcategory.yaml
 - scripting.sitewhere.io_v1alpha4_sitewherescripttemplate.yaml
+- scripting.sitewhere.io_v1alpha4_sitewherescript.yaml
 # +kubebuilder:scaffold:manifestskustomizesamples
