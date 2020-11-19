@@ -6,4 +6,5 @@ resources:
 - sitewhere.io_v1alpha4_tenantengineconfigurationtemplate.yaml
 - sitewhere.io_v1alpha4_tenantconfigurationtemplate.yaml
 - sitewhere.io_v1alpha4_instanceconfigurationtemplate.yaml
+- templates.sitewhere.io_v1alpha4_instancedatasettemplate.yaml
 # +kubebuilder:scaffold:manifestskustomizesamples

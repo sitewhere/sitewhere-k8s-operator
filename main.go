@@ -28,8 +28,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
-	templatesv1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
-
+	templatessitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
 	"github.com/sitewhere/sitewhere-k8s-operator/controllers"
 	// +kubebuilder:scaffold:imports
 )
@@ -43,7 +42,7 @@ func init() {
 	utilruntime.Must(clientgoscheme.AddToScheme(scheme))
 
 	utilruntime.Must(sitewhereiov1alpha4.AddToScheme(scheme))
-	utilruntime.Must(templatesv1alpha4.AddToScheme(scheme))
+	utilruntime.Must(templatessitewhereiov1alpha4.AddToScheme(scheme))
 	// +kubebuilder:scaffold:scheme
 }
 
