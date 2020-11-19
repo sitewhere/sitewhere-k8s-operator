@@ -1,0 +1,20 @@
+# permissions for end users to view sitewherescripttemplates.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sitewherescripttemplate-viewer-role
+rules:
+- apiGroups:
+  - scripting.sitewhere.io
+  resources:
+  - sitewherescripttemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scripting.sitewhere.io
+  resources:
+  - sitewherescripttemplates/status
+  verbs:
+  - get
