@@ -6,25 +6,23 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.3.0
   creationTimestamp: null
-  name: tenantenginedatasets.templates.sitewhere.io
+  name: scriptversions.scripting.sitewhere.io
 spec:
-  group: templates.sitewhere.io
+  group: scripting.sitewhere.io
   names:
     categories:
     - sitewhere-io
     - core-sitewhere-io
-    kind: TenantEngineDatasetTemplate
-    listKind: TenantEngineDatasetTemplateList
-    plural: tenantenginedatasets
+    kind: SiteWhereScriptVersion
+    listKind: SiteWhereScriptVersionList
+    plural: scriptversions
     shortNames:
-    - tedt
-    singular: tenantenginedataset
-  scope: Cluster
-  subresources:
-    status: {}
+    - swscrv
+    singular: scriptversion
+  scope: Namespaced
   validation:
     openAPIV3Schema:
-      description: TenantEngineDatasetTemplate is the Schema for the tenantenginedatasettemplates
+      description: SiteWhereScriptVersion is the Schema for the sitewherescriptversions
         API
       properties:
         apiVersion:
@@ -40,17 +38,18 @@ spec:
         metadata:
           type: object
         spec:
-          description: TenantEngineDatasetTemplateSpec defines the desired state of
-            TenantEngineDatasetTemplate
+          description: SiteWhereScriptVersionSpec defines the desired state of SiteWhereScriptVersion
           properties:
-            configuration:
-              description: Configuration is the configuration for the tenant
-              nullable: true
+            comment:
+              description: Comment is the comment on this version
+              type: string
+            content:
+              description: Content is the comment on this version
               type: string
           type: object
         status:
-          description: TenantEngineDatasetTemplateStatus defines the observed state
-            of TenantEngineDatasetTemplate
+          description: SiteWhereScriptVersionStatus defines the observed state of
+            SiteWhereScriptVersion
           type: object
       type: object
   version: v1alpha4

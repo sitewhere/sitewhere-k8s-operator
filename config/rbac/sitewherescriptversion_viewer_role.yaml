@@ -1,0 +1,20 @@
+# permissions for end users to view sitewherescriptversions.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sitewherescriptversion-viewer-role
+rules:
+- apiGroups:
+  - scripting.sitewhere.io
+  resources:
+  - sitewherescriptversions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - scripting.sitewhere.io
+  resources:
+  - sitewherescriptversions/status
+  verbs:
+  - get
