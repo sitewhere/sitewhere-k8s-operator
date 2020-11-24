@@ -18,8 +18,10 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
+	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -60,6 +62,11 @@ const (
 const (
 	//DefaultReplica is the default value for replicas
 	DefaultReplica int32 = 1
+)
+
+const (
+	// SiteWhere Instance Cluster Role
+	swInstanceClusterRoleName = "sitewhere:instance"
 )
 
 //RenderMicroservices derives SiteWhereMicroservice from a SiteWhereInstance
@@ -328,6 +335,110 @@ func RenderMicroservicesServiceAccount(swInstance *sitewhereiov1alpha4.SiteWhere
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      swInstance.GetName(),
 			Namespace: namespace.GetName(),
+		},
+	}, nil
+}
+
+// RenderMicroservicesClusterRole derices a ClusterRole for the Deployments of SW Instace
+func RenderMicroservicesClusterRole(swInstance *sitewhereiov1alpha4.SiteWhereInstance) (*rbacv1.ClusterRole, error) {
+	return &rbacv1.ClusterRole{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ClusterRole",
+			APIVersion: "rbac.authorization.k8s.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: swInstanceClusterRoleName,
+			Labels: map[string]string{
+				"app": "sitewhere",
+			},
+		},
+		Rules: []rbacv1.PolicyRule{
+			{
+				APIGroups: []string{
+					"sitewhere.io",
+				},
+				Resources: []string{
+					"instances",
+					"instances/status",
+					"microservices",
+					"tenants",
+					"tenantengines",
+					"tenantengines/status",
+				},
+				Verbs: []string{
+					"*",
+				},
+			}, {
+				APIGroups: []string{
+					"templates.sitewhere.io",
+				},
+				Resources: []string{
+					"instanceconfigurations",
+					"instancedatasets",
+					"tenantconfigurations",
+					"tenantengineconfigurations",
+					"tenantdatasets",
+					"tenantenginedatasets",
+				},
+				Verbs: []string{
+					"*",
+				},
+			}, {
+				APIGroups: []string{
+					"scripting.sitewhere.io",
+				},
+				Resources: []string{
+					"scriptcategories",
+					"scripttemplates",
+					"scripts",
+					"scriptversions",
+				},
+				Verbs: []string{
+					"*",
+				},
+			}, {
+				APIGroups: []string{
+					"apiextensions.k8s.io",
+				},
+				Resources: []string{
+					"customresourcedefinitions",
+				},
+				Verbs: []string{
+					"*",
+				},
+			},
+		},
+	}, nil
+}
+
+// RenderMicroservicesClusterRoleBinding derices a ClusterRoleBinding for the Deployments of SW Instace
+func RenderMicroservicesClusterRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	namespace *corev1.Namespace,
+	sa *corev1.ServiceAccount,
+	cr *rbacv1.ClusterRole) (*rbacv1.ClusterRoleBinding, error) {
+	roleBindingName := fmt.Sprintf("sitewhere:instance:%s", swInstance.GetName())
+	return &rbacv1.ClusterRoleBinding{
+		TypeMeta: metav1.TypeMeta{
+			Kind:       "ClusterRoleBinding",
+			APIVersion: "rbac.authorization.k8s.io/v1",
+		},
+		ObjectMeta: metav1.ObjectMeta{
+			Name: roleBindingName,
+			Labels: map[string]string{
+				"app": "sitewhere",
+			},
+		},
+		Subjects: []rbacv1.Subject{
+			{
+				Kind:      "ServiceAccount",
+				Namespace: namespace.ObjectMeta.Name,
+				Name:      sa.ObjectMeta.Name,
+			},
+		},
+		RoleRef: rbacv1.RoleRef{
+			APIGroup: "rbac.authorization.k8s.io",
+			Kind:     "ClusterRole",
+			Name:     cr.ObjectMeta.Name,
 		},
 	}, nil
 }

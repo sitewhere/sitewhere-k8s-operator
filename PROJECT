@@ -39,6 +39,9 @@ resources:
 - group: scripting.sitewhere.io
   kind: SiteWhereScript
   version: v1alpha4
+- group: scripting.sitewhere.io
+  kind: SiteWhereScriptVersion
+  version: v1alpha4
 version: 3-alpha
 plugins:
   go.sdk.operatorframework.io/v2-alpha: {}

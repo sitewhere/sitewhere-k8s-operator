@@ -35,7 +35,6 @@ type SiteWhereScriptVersionStatus struct {
 
 // +kubebuilder:object:root=true
 // +kubebuilder:subresource:status
-
 // +kubebuilder:resource:path=scriptversions,scope=Namespaced,singular=scriptversion,shortName=swscrv,categories=sitewhere-io;core-sitewhere-io
 
 // SiteWhereScriptVersion is the Schema for the sitewherescriptversions API

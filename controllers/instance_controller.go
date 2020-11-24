@@ -105,6 +105,46 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
 	}
 
+	// CusterRole for Service Account
+	msClusterRole, err := RenderMicroservicesClusterRole(&swInstance)
+	if err != nil {
+		log.Error(err, "cannot render cluster role for instace")
+		return ctrl.Result{}, err
+	}
+	// Set ownership
+	if err := r.Create(ctx, msClusterRole); err != nil {
+		if apierrors.IsAlreadyExists(err) {
+			log.Info(fmt.Sprintf("ClusterRole %s already exists", msClusterRole.GetName()))
+		} else {
+			log.Error(err, "can not create ClusterRole from instance")
+			return ctrl.Result{}, err
+		}
+	} else {
+		var message = fmt.Sprintf("ClusterRole %s for instance created.", msClusterRole.GetName())
+		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
+	}
+
+	// CusterRoleBinding for Service Account
+	msClusterRoleBinding, err := RenderMicroservicesClusterRoleBinding(&swInstance, namespace, msServiceAccount, msClusterRole)
+	if err != nil {
+		log.Error(err, "cannot render cluster role binding for instace")
+		return ctrl.Result{}, err
+	}
+	// Set ownership
+	ctrl.SetControllerReference(&swInstance, msClusterRoleBinding, r.Scheme)
+	// Create resource
+	if err := r.Create(ctx, msClusterRoleBinding); err != nil {
+		if apierrors.IsAlreadyExists(err) {
+			log.Info(fmt.Sprintf("ClusterRoleBinding %s already exists", msClusterRoleBinding.GetName()))
+		} else {
+			log.Error(err, "can not create ClusterRoleBinding from instance")
+			return ctrl.Result{}, err
+		}
+	} else {
+		var message = fmt.Sprintf("ClusterRoleBinding %s for instance created.", msClusterRoleBinding.GetName())
+		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
+	}
+
 	// If we don't have configuration, copy from InstanceConfigurationTemplate
 	if swInstance.Spec.Configuration == nil {
 		instanceConfigurationTemplate, err := FindInstanceConfigurationTemplate(ctx, r.Client, swInstance.Spec.ConfigurationTemplate)
