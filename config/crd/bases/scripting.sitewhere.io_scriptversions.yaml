@@ -20,6 +20,8 @@ spec:
     - swscrv
     singular: scriptversion
   scope: Namespaced
+  subresources:
+    status: {}
   validation:
     openAPIV3Schema:
       description: SiteWhereScriptVersion is the Schema for the sitewherescriptversions
