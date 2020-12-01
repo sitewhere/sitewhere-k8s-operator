@@ -139,6 +139,18 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 										},
 									},
 								},
+								corev1.EnvVar{
+									Name:  "sitewhere.config.product.id",
+									Value: swInstance.Name,
+								},
+								corev1.EnvVar{
+									Name:  "keycloak.service.name",
+									Value: "sitewhere-keycloak-http",
+								},
+								corev1.EnvVar{
+									Name:  "sitewhere.config.keycloak.realm",
+									Value: "sitewhere",
+								},
 							},
 						},
 					},
