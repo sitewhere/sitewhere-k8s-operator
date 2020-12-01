@@ -8,6 +8,6 @@ spec:
   authenticationToken: sitewhere0123456789
   authorizedUserIds:
     - "admin"
-    - "noadmin"
+    - "remote"
   configurationTemplate: default
-  datasetTemplate: default
+  datasetTemplate: construction
