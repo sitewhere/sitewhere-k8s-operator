@@ -18,11 +18,13 @@ package controllers
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
@@ -71,6 +73,25 @@ const (
 
 //RenderMicroservices derives SiteWhereMicroservice from a SiteWhereInstance
 func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance, ns *corev1.Namespace) ([]*sitewhereiov1alpha4.SiteWhereMicroservice, error) {
+
+	var imConfiguration = &sitewhereiov1alpha4.InstanceMangementConfiguration{
+		UserManagementConfiguration: &sitewhereiov1alpha4.UserManagementConfiguration{
+			SyncopeHost:            "sitewhere-syncope.sitewhere-system.cluster.local",
+			SyncopePort:            8080,
+			JWTExpirationInMinutes: 60,
+		},
+	}
+
+	marshalledBytes, err := json.Marshal(imConfiguration)
+	if err != nil {
+		return nil, err
+	}
+
+	var instanceManagementConfiguration = &runtime.RawExtension{}
+	err = instanceManagementConfiguration.UnmarshalJSON(marshalledBytes)
+	if err != nil {
+		return nil, err
+	}
 
 	var result = []*sitewhereiov1alpha4.SiteWhereMicroservice{
 		&sitewhereiov1alpha4.SiteWhereMicroservice{
@@ -251,6 +272,7 @@ func RenderMicroservices(swInstance *sitewhereiov1alpha4.SiteWhereInstance, ns *
 				Icon:           "fa-sitemap",
 				Replicas:       DefaultReplica,
 				Multitenant:    false,
+				Configuration:  instanceManagementConfiguration,
 			},
 		},
 		&sitewhereiov1alpha4.SiteWhereMicroservice{

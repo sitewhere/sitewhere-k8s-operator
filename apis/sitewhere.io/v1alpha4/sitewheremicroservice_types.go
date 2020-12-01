@@ -18,7 +18,25 @@ package v1alpha4
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	runtime "k8s.io/apimachinery/pkg/runtime"
 )
+
+// UserManagementConfiguration is the configuration for User Management
+type UserManagementConfiguration struct {
+	// SyncopeHost is the hostname of Syncope API
+	SyncopeHost string `json:"syncopeHost,omitempty"`
+
+	// SyncopePort is the port of Syncope API
+	SyncopePort int `json:"syncopePort,omitempty"`
+
+	// JWTExpirationInMinutes is the expiration in minutes of the JWT.
+	JWTExpirationInMinutes int `json:"jwtExpirationInMinutes,omitempty"`
+}
+
+// InstanceMangementConfiguration is the configuration of instance management
+type InstanceMangementConfiguration struct {
+	UserManagementConfiguration *UserManagementConfiguration `json:"userManagement,omitempty"`
+}
 
 // SiteWhereMicroserviceSpec defines the desired state of SiteWhereMicroservice
 type SiteWhereMicroserviceSpec struct {
@@ -39,6 +57,9 @@ type SiteWhereMicroserviceSpec struct {
 
 	// Multitenant indicates whether microservice has tenant engines
 	Multitenant bool `json:"multitenant,omitempty"`
+
+	// Configuration is the configuration of the microservice
+	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
 
 // SiteWhereMicroserviceStatus defines the observed state of SiteWhereMicroservice

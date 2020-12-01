@@ -69,7 +69,7 @@ type SiteWhereInstanceSpec struct {
 	DatasetTemplate string `json:"datasetTemplate,omitempty"`
 	// DockerSpec is the
 	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
-	// Configuration is the configuration of the microservice
+	// Configuration is the configuration of the instance
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
 

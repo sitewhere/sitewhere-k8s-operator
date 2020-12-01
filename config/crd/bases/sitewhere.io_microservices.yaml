@@ -45,6 +45,9 @@ spec:
         spec:
           description: SiteWhereMicroserviceSpec defines the desired state of SiteWhereMicroservice
           properties:
+            configuration:
+              description: Configuration is the configuration of the microservice
+              type: object
             description:
               description: Description is the description of the microservice
               type: string

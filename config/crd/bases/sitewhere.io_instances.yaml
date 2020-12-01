@@ -55,7 +55,7 @@ spec:
           description: SiteWhereInstanceSpec defines the desired state of SiteWhereInstance
           properties:
             configuration:
-              description: Configuration is the configuration of the microservice
+              description: Configuration is the configuration of the instance
               type: object
             configurationTemplate:
               description: ConfigurationTemplate is the name of the configuration
