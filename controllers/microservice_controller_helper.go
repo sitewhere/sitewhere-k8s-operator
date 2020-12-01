@@ -118,13 +118,8 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 							},
 							Env: []corev1.EnvVar{
 								corev1.EnvVar{
-									Name: "sitewhere.config.k8s.name",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "metadata.name",
-										},
-									},
+									Name:  "sitewhere.config.k8s.name",
+									Value: swMicroservice.Spec.FunctionalArea,
 								},
 								corev1.EnvVar{
 									Name: "sitewhere.config.k8s.namespace",
