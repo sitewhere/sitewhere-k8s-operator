@@ -65,16 +65,7 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 
 	var labelsSelectorMap = buildLabelsSelectors(swInstance, swMicroservice)
 
-	var dockerSpec = sitewhereiov1alpha4.DefaultDockerSpec
-	if swInstance.Spec.DockerSpec != nil {
-		dockerSpec = swInstance.Spec.DockerSpec
-	}
-
-	var imageName = fmt.Sprintf("%s/%s/service-%s:%s",
-		dockerSpec.Registry,
-		dockerSpec.Repository,
-		swMicroservice.GetName(),
-		dockerSpec.Tag)
+	var podSpec = renderDeploymentPodSpec(swInstance, swMicroservice)
 
 	var deployment = &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -100,72 +91,9 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 						"prometheus.io/scrape": "true",
 					},
 				},
-				Spec: corev1.PodSpec{
-					ServiceAccountName: swInstance.GetName(),
-					Containers: []corev1.Container{
-						corev1.Container{
-							Name:  swMicroservice.GetName(),
-							Image: imageName,
-							Ports: []corev1.ContainerPort{
-								corev1.ContainerPort{
-									ContainerPort: 9000,
-									Protocol:      corev1.ProtocolTCP,
-								},
-								corev1.ContainerPort{
-									ContainerPort: 9090,
-									Protocol:      corev1.ProtocolTCP,
-								},
-							},
-							Env: []corev1.EnvVar{
-								corev1.EnvVar{
-									Name:  "sitewhere.config.k8s.name",
-									Value: swMicroservice.Spec.FunctionalArea,
-								},
-								corev1.EnvVar{
-									Name: "sitewhere.config.k8s.namespace",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "metadata.namespace",
-										},
-									},
-								},
-								corev1.EnvVar{
-									Name: "sitewhere.config.k8s.pod.ip",
-									ValueFrom: &corev1.EnvVarSource{
-										FieldRef: &corev1.ObjectFieldSelector{
-											APIVersion: "v1",
-											FieldPath:  "status.podIP",
-										},
-									},
-								},
-								corev1.EnvVar{
-									Name:  "sitewhere.config.product.id",
-									Value: swInstance.Name,
-								},
-								corev1.EnvVar{
-									Name:  "keycloak.service.name",
-									Value: "sitewhere-keycloak-http",
-								},
-								corev1.EnvVar{
-									Name:  "sitewhere.config.keycloak.realm",
-									Value: "sitewhere",
-								},
-							},
-						},
-					},
-				},
+				Spec: podSpec,
 			},
 		},
-	}
-
-	// Handle Instance Management special case
-	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
-		deployment.Spec.Template.Spec.Containers[0].Ports = append(deployment.Spec.Template.Spec.Containers[0].Ports,
-			corev1.ContainerPort{
-				ContainerPort: 8080,
-				Protocol:      corev1.ProtocolTCP,
-			})
 	}
 
 	return deployment, nil
@@ -284,4 +212,110 @@ func buildLabelsSelectors(
 		defaultLabelName:     swMicroservice.GetName(),
 		defaultLabelInstance: swInstance.GetName(),
 	}
+}
+
+func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) corev1.PodSpec {
+
+	var dockerSpec = sitewhereiov1alpha4.DefaultDockerSpec
+	if swInstance.Spec.DockerSpec != nil {
+		dockerSpec = swInstance.Spec.DockerSpec
+	}
+
+	var imageName = fmt.Sprintf("%s/%s/service-%s:%s",
+		dockerSpec.Registry,
+		dockerSpec.Repository,
+		swMicroservice.GetName(),
+		dockerSpec.Tag)
+
+	var envVars = renderDeploymentPodSpecEnvVars(swInstance, swMicroservice)
+	var containerPorts = renderDeploymentPodSpecContainerPorts(swInstance, swMicroservice)
+	return corev1.PodSpec{
+		ServiceAccountName: swInstance.GetName(),
+		Containers: []corev1.Container{
+			corev1.Container{
+				Name:  swMicroservice.GetName(),
+				Image: imageName,
+				Ports: containerPorts,
+				Env:   envVars,
+			},
+		},
+	}
+}
+
+func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) []corev1.EnvVar {
+
+	var defaultEnvVars = []corev1.EnvVar{
+		corev1.EnvVar{
+			Name:  "sitewhere.config.k8s.name",
+			Value: swMicroservice.Spec.FunctionalArea,
+		},
+		corev1.EnvVar{
+			Name: "sitewhere.config.k8s.namespace",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					APIVersion: "v1",
+					FieldPath:  "metadata.namespace",
+				},
+			},
+		},
+		corev1.EnvVar{
+			Name: "sitewhere.config.k8s.pod.ip",
+			ValueFrom: &corev1.EnvVarSource{
+				FieldRef: &corev1.ObjectFieldSelector{
+					APIVersion: "v1",
+					FieldPath:  "status.podIP",
+				},
+			},
+		},
+	}
+
+	// Handle Instance Management special case
+	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
+		var instanceManagementEnvVars = []corev1.EnvVar{corev1.EnvVar{
+			Name:  "sitewhere.config.product.id",
+			Value: swInstance.Name,
+		},
+			corev1.EnvVar{
+				Name:  "keycloak.service.name",
+				Value: "sitewhere-keycloak-http",
+			},
+			corev1.EnvVar{
+				Name:  "sitewhere.config.keycloak.realm",
+				Value: "sitewhere",
+			},
+		}
+		defaultEnvVars = append(defaultEnvVars, instanceManagementEnvVars...)
+	}
+
+	return defaultEnvVars
+}
+
+func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) []corev1.ContainerPort {
+
+	var defaultContainerPorts = []corev1.ContainerPort{
+		corev1.ContainerPort{
+			ContainerPort: 9000,
+			Protocol:      corev1.ProtocolTCP,
+		},
+		corev1.ContainerPort{
+			ContainerPort: 9090,
+			Protocol:      corev1.ProtocolTCP,
+		},
+	}
+
+	// Handle Instance Management special case
+	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
+		var instanceMangementContinerPorts = []corev1.ContainerPort{
+			corev1.ContainerPort{
+				ContainerPort: 8080,
+				Protocol:      corev1.ProtocolTCP,
+			},
+		}
+		defaultContainerPorts = append(defaultContainerPorts, instanceMangementContinerPorts...)
+	}
+
+	return defaultContainerPorts
 }
