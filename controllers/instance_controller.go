@@ -185,6 +185,27 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
 	}
 
+	// Secret for the Instance
+	siSecret, err := RenderInstanceSecret(&swInstance, namespace)
+	if err != nil {
+		log.Error(err, "cannot render secret for instace")
+		return ctrl.Result{}, err
+	}
+	// Set ownership
+	ctrl.SetControllerReference(&swInstance, siSecret, r.Scheme)
+	// Create resource
+	if err := r.Create(ctx, siSecret); err != nil {
+		if apierrors.IsAlreadyExists(err) {
+			log.Info(fmt.Sprintf("Secret %s already exists", siSecret.GetName()))
+		} else {
+			log.Error(err, "can not create Secret from instance")
+			return ctrl.Result{}, err
+		}
+	} else {
+		var message = fmt.Sprintf("Secret %s for instance created.", siSecret.GetName())
+		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
+	}
+
 	// If we don't have configuration, copy from InstanceConfigurationTemplate
 	if swInstance.Spec.Configuration == nil {
 		instanceConfigurationTemplate, err := FindInstanceConfigurationTemplate(ctx, r.Client, swInstance.Spec.ConfigurationTemplate)

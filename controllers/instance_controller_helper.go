@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	b64 "encoding/base64"
 	"encoding/json"
 	"fmt"
 
@@ -27,6 +28,8 @@ import (
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
+
+	"github.com/sitewhere/sitewhere-k8s-operator/pkg/rand"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
 	templatesv1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
@@ -72,6 +75,11 @@ const (
 
 	// SiteWhere Instance Role Name
 	swInstanceRoleName = "sitewhere-system:reader"
+)
+
+const (
+	// Client Secret key
+	clientSecretKey = "client-secret"
 )
 
 //RenderMicroservices derives SiteWhereMicroservice from a SiteWhereInstance
@@ -542,6 +550,28 @@ func RenderMicroservicesRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereIns
 			APIGroup: "rbac.authorization.k8s.io",
 			Kind:     "Role",
 			Name:     cr.ObjectMeta.Name,
+		},
+	}, nil
+}
+
+// RenderInstanceSecret renders a Secret for the instace
+func RenderInstanceSecret(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	namespace *corev1.Namespace) (*corev1.Secret, error) {
+
+	var randomSecret = rand.String(16)
+	encodedClientSecret := b64.StdEncoding.EncodeToString([]byte(randomSecret))
+
+	return &corev1.Secret{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:      swInstance.GetName(),
+			Namespace: namespace.GetName(),
+			Labels: map[string]string{
+				"app": "sitewhere",
+			},
+		},
+		Type: corev1.SecretTypeOpaque,
+		Data: map[string][]byte{
+			clientSecretKey: []byte(encodedClientSecret),
 		},
 	}, nil
 }
