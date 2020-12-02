@@ -437,7 +437,7 @@ func RenderMicroservicesClusterRole(swInstance *sitewhereiov1alpha4.SiteWhereIns
 }
 
 // RenderMicroservicesRole derices a Role for the Deployments of SW Instace
-func RenderMicroservicesRole(swInstance *sitewhereiov1alpha4.SiteWhereInstance) (*rbacv1.Role, error) {
+func RenderMicroservicesRole(swInstance *sitewhereiov1alpha4.SiteWhereInstance, sa *corev1.ServiceAccount) (*rbacv1.Role, error) {
 	return &rbacv1.Role{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "Role",
@@ -445,7 +445,7 @@ func RenderMicroservicesRole(swInstance *sitewhereiov1alpha4.SiteWhereInstance) 
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      swInstanceRoleName,
-			Namespace: swInstance.Namespace,
+			Namespace: sa.ObjectMeta.Namespace,
 			Labels: map[string]string{
 				"app": "sitewhere",
 			},
@@ -526,7 +526,7 @@ func RenderMicroservicesRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereIns
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      roleBindingName,
-			Namespace: swInstance.Namespace,
+			Namespace: sa.ObjectMeta.Namespace,
 			Labels: map[string]string{
 				"app": "sitewhere",
 			},

@@ -146,7 +146,7 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 	}
 
 	// Role for Service Account
-	msRole, err := RenderMicroservicesRole(&swInstance)
+	msRole, err := RenderMicroservicesRole(&swInstance, msServiceAccount)
 	if err != nil {
 		log.Error(err, "cannot render role for instace")
 		return ctrl.Result{}, err
