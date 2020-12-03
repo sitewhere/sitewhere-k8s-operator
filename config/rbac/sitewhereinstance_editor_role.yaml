@@ -1,0 +1,24 @@
+# permissions for end users to edit sitewhereinstances.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sitewhereinstance-editor-role
+rules:
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - instances
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - instances/status
+  verbs:
+  - get

@@ -1,0 +1,7 @@
+apiVersion: scripting.sitewhere.io/v1alpha4
+kind: SiteWhereScriptTemplate
+metadata:
+  name: sitewherescripttemplate-sample
+spec:
+  # Add fields here
+  foo: bar

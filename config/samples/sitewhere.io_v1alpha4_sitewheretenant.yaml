@@ -1,0 +1,13 @@
+apiVersion: sitewhere.io/v1alpha4
+kind: SiteWhereTenant
+metadata:
+  name: default
+  namespace: sitewhere
+spec:
+  name: default
+  authenticationToken: sitewhere0123456789
+  authorizedUserIds:
+    - "admin"
+    - "remote"
+  configurationTemplate: default
+  datasetTemplate: construction

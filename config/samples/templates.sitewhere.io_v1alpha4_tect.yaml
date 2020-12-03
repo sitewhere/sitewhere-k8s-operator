@@ -1,0 +1,202 @@
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-asset-management
+  labels:
+    sitewhere.io/functional-area: asset-management
+spec:
+  configuration: 
+    datastore:
+      reference: postgres
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-batch-operations
+  labels:
+      sitewhere.io/functional-area: batch-operations
+spec:
+  configuration:
+    datastore:
+      reference: postgres
+    batchOperationManager:
+      throttleDelayMs: 100
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-command-delivery
+  labels:
+      sitewhere.io/functional-area: command-delivery
+spec:
+  configuration:
+    router:
+      type: device-type-mapping
+      configuration:
+        mappings: []
+        defaultDestination: default
+    commandDestinations:
+      - id: default
+        type: mqtt
+        parameterExtractor:
+          type: mqtt-default
+          configuration:
+            commandTopicExpression: SiteWhere/${tenant.token}/command/${device.token}
+            systemTopicExpression: SiteWhere/${tenant.token}/system/${device.token}
+        configuration:
+          hostname: sitewhere-infrastructure-mosquitto.sitewhere-system
+          port: 1883
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-device-management
+  labels:
+    sitewhere.io/functional-area: device-management
+spec:
+  configuration: 
+    datastore:
+      reference: postgres
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-device-state
+  labels:
+      sitewhere.io/functional-area: device-state
+spec:
+  configuration: 
+    datastore:
+      reference: postgres
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-event-management
+  labels:
+    sitewhere.io/functional-area: event-management
+spec:
+  configuration:
+    datastore:
+      reference: influxdb
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-event-search
+  labels:
+      sitewhere.io/functional-area: event-search
+spec:
+  configuration:
+    foo: "bar"
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-event-sources
+  labels:
+      sitewhere.io/functional-area: event-sources
+spec:
+  configuration:
+    eventSources:
+      - id: json
+        type: mqtt
+        decoder:
+          type: json
+          configuration: {}
+        configuration:
+          hostname: sitewhere-infrastructure-mosquitto.sitewhere-system
+          port: 1883
+          topic: SiteWhere/${tenant.token}/input/json
+          numThreads: 3
+      - id: protobuf
+        type: mqtt
+        decoder:
+          type: protobuf
+          configuration: {}
+        configuration:
+          hostname: sitewhere-infrastructure-mosquitto.sitewhere-system
+          port: 1883
+          topic: SiteWhere/${tenant.token}/input/protobuf
+          numThreads: 3
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-inbound-processing
+  labels:
+      sitewhere.io/functional-area: inbound-processing
+spec:
+  configuration:
+    processingThreadCount: 10
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-label-generation
+  labels:
+      sitewhere.io/functional-area: label-generation
+spec:
+  configuration:
+    manager: {}
+    generators:
+      - id: qrcode
+        name: "QR Code Generator"
+        type: qr-code
+        configuration:
+          width: 200
+          height: 200
+          foregroundColor: 333333ff
+          backgroundColor: ffffffff
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-outbound-connectors
+  labels:
+      sitewhere.io/functional-area: outbound-connectors
+spec:
+  configuration:
+    outboundConnectors:
+      - id: mqtt1
+        type: mqtt
+        configuration:
+          hostname: sitewhere-infrastructure-mosquitto.sitewhere-system
+          port: 1883
+          topic: SiteWhere/${tenant.token}/output/mqtt
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-schedule-management
+  labels:
+      sitewhere.io/functional-area: schedule-management
+spec:
+  configuration: 
+    datastore:
+      reference: postgres
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-streaming-media
+  labels:
+    sitewhere.io/functional-area: streaming-media
+spec:
+  configuration: 
+    foo: "bar"
+---
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineConfigurationTemplate
+metadata:
+  name: default-device-registration
+  labels:
+      sitewhere.io/functional-area: device-registration
+spec:
+  configuration:
+    allowNewDevices: false
+    assignmentDefaults:
+      defaultDeviceTypeToken: mega2560
+      defaultCustomerToken: acme
+      defaultAreaToken: southeast
+

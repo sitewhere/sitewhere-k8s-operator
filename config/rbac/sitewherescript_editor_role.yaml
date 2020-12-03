@@ -1,0 +1,24 @@
+# permissions for end users to edit sitewherescripts.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sitewherescript-editor-role
+rules:
+- apiGroups:
+  - scripting.sitewhere.io
+  resources:
+  - sitewherescripts
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - scripting.sitewhere.io
+  resources:
+  - sitewherescripts/status
+  verbs:
+  - get

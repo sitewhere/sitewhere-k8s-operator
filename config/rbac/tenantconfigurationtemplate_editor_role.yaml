@@ -1,0 +1,24 @@
+# permissions for end users to edit tenantconfigurationtemplates.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tenantconfigurationtemplate-editor-role
+rules:
+- apiGroups:
+  - templates.sitewhere.io
+  resources:
+  - tenantconfigurationtemplates
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - templates.sitewhere.io
+  resources:
+  - tenantconfigurationtemplates/status
+  verbs:
+  - get

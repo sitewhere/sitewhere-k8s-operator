@@ -1,0 +1,20 @@
+# permissions for end users to view tenantengineconfigurationtemplates.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: tenantengineconfigurationtemplate-viewer-role
+rules:
+- apiGroups:
+  - templates.sitewhere.io
+  resources:
+  - tenantengineconfigurationtemplates
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - templates.sitewhere.io
+  resources:
+  - tenantengineconfigurationtemplates/status
+  verbs:
+  - get

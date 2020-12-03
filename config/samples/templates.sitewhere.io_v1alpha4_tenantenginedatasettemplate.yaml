@@ -1,0 +1,7 @@
+apiVersion: templates.sitewhere.io/v1alpha4
+kind: TenantEngineDatasetTemplate
+metadata:
+  name: tenantenginedatasettemplate-sample
+spec:
+  # Add fields here
+  foo: bar

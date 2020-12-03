@@ -1,0 +1,12 @@
+apiVersion: sitewhere.io/v1alpha4
+kind: SiteWhereInstance
+metadata:
+  name: sitewhere2
+spec:
+  configurationTemplate: default
+  datasetTemplate: default
+  dockerSpec:
+    registry: docker.io
+    repository: sitewhere
+    tag: 3.0.0.beta3
+  configuration: "something sdsdsdssd"

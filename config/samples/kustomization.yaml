@@ -1,0 +1,15 @@
+## Append samples you want in your CSV to this file as resources ##
+resources:
+- sitewhere.io_v1alpha4_instance.yaml
+- sitewhere.io_v1alpha4_microservice.yaml
+- sitewhere.io_v1alpha4_sitewheretenantengine.yaml
+- sitewhere.io_v1alpha4_tenantengineconfigurationtemplate.yaml
+- sitewhere.io_v1alpha4_tenantconfigurationtemplate.yaml
+- sitewhere.io_v1alpha4_instanceconfigurationtemplate.yaml
+- templates.sitewhere.io_v1alpha4_instancedatasettemplate.yaml
+- templates.sitewhere.io_v1alpha4_tenantdatasettemplate.yaml
+- templates.sitewhere.io_v1alpha4_tenantenginedatasettemplate.yaml
+- scripting.sitewhere.io_v1alpha4_sitewherescriptcategory.yaml
+- scripting.sitewhere.io_v1alpha4_sitewherescripttemplate.yaml
+- scripting.sitewhere.io_v1alpha4_sitewherescript.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples

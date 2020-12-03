@@ -1,0 +1,24 @@
+# permissions for end users to edit sitewheretenants.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: sitewheretenant-editor-role
+rules:
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - sitewheretenants
+  verbs:
+  - create
+  - delete
+  - get
+  - list
+  - patch
+  - update
+  - watch
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - sitewheretenants/status
+  verbs:
+  - get
