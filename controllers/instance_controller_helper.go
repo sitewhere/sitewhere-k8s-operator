@@ -74,7 +74,7 @@ const (
 	swInstanceClusterRoleName = "sitewhere:instance"
 
 	// SiteWhere Instance Role Name
-	swInstanceRoleName = "sitewhere-system:reader"
+	swInstanceRoleName = "sitewhere-system-reader"
 )
 
 const (
@@ -444,51 +444,6 @@ func RenderMicroservicesClusterRole(swInstance *sitewhereiov1alpha4.SiteWhereIns
 	}, nil
 }
 
-// RenderMicroservicesRole derices a Role for the Deployments of SW Instace
-func RenderMicroservicesRole(swInstance *sitewhereiov1alpha4.SiteWhereInstance, sa *corev1.ServiceAccount) (*rbacv1.Role, error) {
-	return &rbacv1.Role{
-		TypeMeta: metav1.TypeMeta{
-			Kind:       "Role",
-			APIVersion: "rbac.authorization.k8s.io/v1",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      swInstanceRoleName,
-			Namespace: sa.ObjectMeta.Namespace,
-			Labels: map[string]string{
-				"app": "sitewhere",
-			},
-		},
-		Rules: []rbacv1.PolicyRule{
-			{
-				APIGroups: []string{
-					"",
-				},
-				Resources: []string{
-					"services",
-					"services/status",
-				},
-				Verbs: []string{
-					"get",
-					"list",
-					"watch",
-				},
-			}, {
-				APIGroups: []string{
-					"apps",
-				},
-				Resources: []string{
-					"deployments",
-				},
-				Verbs: []string{
-					"get",
-					"list",
-					"watch",
-				},
-			},
-		},
-	}, nil
-}
-
 // RenderMicroservicesClusterRoleBinding derices a ClusterRoleBinding for the Deployments of SW Instace
 func RenderMicroservicesClusterRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	namespace *corev1.Namespace,
@@ -524,8 +479,7 @@ func RenderMicroservicesClusterRoleBinding(swInstance *sitewhereiov1alpha4.SiteW
 // RenderMicroservicesRoleBinding derices a RoleBinding for the Deployments of SW Instace
 func RenderMicroservicesRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	namespace *corev1.Namespace,
-	sa *corev1.ServiceAccount,
-	cr *rbacv1.Role) (*rbacv1.RoleBinding, error) {
+	sa *corev1.ServiceAccount) (*rbacv1.RoleBinding, error) {
 	roleBindingName := fmt.Sprintf("sitewhere:instance:%s", swInstance.GetName())
 	return &rbacv1.RoleBinding{
 		TypeMeta: metav1.TypeMeta{
@@ -534,7 +488,7 @@ func RenderMicroservicesRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereIns
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      roleBindingName,
-			Namespace: sa.ObjectMeta.Namespace,
+			Namespace: "sitewhere-system",
 			Labels: map[string]string{
 				"app": "sitewhere",
 			},
@@ -548,8 +502,8 @@ func RenderMicroservicesRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereIns
 		},
 		RoleRef: rbacv1.RoleRef{
 			APIGroup: "rbac.authorization.k8s.io",
-			Kind:     "Role",
-			Name:     cr.ObjectMeta.Name,
+			Kind:     "ClusterRole",
+			Name:     swInstanceRoleName,
 		},
 	}, nil
 }
