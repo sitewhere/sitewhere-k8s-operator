@@ -145,27 +145,8 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
 	}
 
-	// Role for Service Account
-	msRole, err := RenderMicroservicesRole(&swInstance, msServiceAccount)
-	if err != nil {
-		log.Error(err, "cannot render role for instace")
-		return ctrl.Result{}, err
-	}
-	// Set ownership
-	if err := r.Create(ctx, msRole); err != nil {
-		if apierrors.IsAlreadyExists(err) {
-			log.Info(fmt.Sprintf("Role %s already exists", msRole.GetName()))
-		} else {
-			log.Error(err, "can not create Role from instance")
-			return ctrl.Result{}, err
-		}
-	} else {
-		var message = fmt.Sprintf("Role %s for instance created.", msRole.GetName())
-		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
-	}
-
 	// RoleBinding for Service Account
-	msRoleBinding, err := RenderMicroservicesRoleBinding(&swInstance, namespace, msServiceAccount, msRole)
+	msRoleBinding, err := RenderMicroservicesRoleBinding(&swInstance, namespace, msServiceAccount)
 	if err != nil {
 		log.Error(err, "cannot render cluster role binding for instace")
 		return ctrl.Result{}, err
