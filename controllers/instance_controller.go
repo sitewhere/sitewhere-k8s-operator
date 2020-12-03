@@ -58,8 +58,8 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 
 	r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", "Bootstraping")
 
-	swInstance.Status.TenantManagementBootstrapState = sitewhereiov1alpha4.Bootstrapping
-	swInstance.Status.UserManagementBootstrapState = sitewhereiov1alpha4.Bootstrapping
+	swInstance.Status.TenantManagementBootstrapState = sitewhereiov1alpha4.NotBootstrapped
+	swInstance.Status.UserManagementBootstrapState = sitewhereiov1alpha4.NotBootstrapped
 
 	if err := r.Status().Update(context.Background(), &swInstance); err != nil {
 		return ctrl.Result{}, err
