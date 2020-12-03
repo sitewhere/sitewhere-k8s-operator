@@ -488,7 +488,7 @@ func RenderMicroservicesRoleBinding(swInstance *sitewhereiov1alpha4.SiteWhereIns
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      roleBindingName,
-			Namespace: namespace.ObjectMeta.Name,
+			Namespace: "sitewhere-system",
 			Labels: map[string]string{
 				"app": "sitewhere",
 			},
