@@ -1,0 +1,119 @@
+apiVersion: sitewhere.io/v1alpha3
+kind: SiteWhereMicroservice
+metadata:
+  name: instance-management-microservice
+spec:
+  replicas: 1
+  instanceName: sitewhere
+  functionalArea: instance-management
+  helm:
+    chartName: sitewhere-0.2.6
+    releaseName: sitewhere
+    releaseService: Tiller
+  podSpec:
+    imageRegistry: docker.io
+    imageRepository: sitewhere
+    imageTag: latest
+    imagePullPolicy: IfNotPresent
+    ports:
+      - containerPort: 9000
+      - containerPort: 9001
+      - containerPort: 900
+      - containerPort: 9090
+    env:
+      - name: "sitewhere.k8s.pod.ip"
+        valueFrom:
+          fieldRef:
+            fieldPath: status.podIP
+      - name: "sitewhere.namespace"
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+      - name: "sitewhere.instance.id"
+        value: "sitewhere"
+      - name: "sitewhere.metrics.port"
+        value: "9090"
+      - name: "sitewhere.zookeeper.host"
+        value: "sitewhere-cp-zookeeper"
+      - name: "sitewhere.zookeeper.port"
+        value: "2181"
+      - name: "sitewhere.kafka.bootstrap.servers"
+        value: "sitewhere-cp-kafka:9092"
+      - name: "sitewhere.kafka.defaultTopicReplicationFactor"
+        value: "3"
+      - name: "sitewhere.grpc.maxRetryCount"
+        value: "7"
+      - name: "sitewhere.grpc.initialBackoffSeconds"
+        value: "11"
+      - name: "sitewhere.grpc.maxBackoffSeconds"
+        value: "700"
+      - name: "sitewhere.grpc.backoffMultiplier"
+        value: "1.6"
+      - name: "sitewhere.grpc.resolveFQDN"
+        value: "false"
+      - name: "mqtt.host"
+        value: "sitewhere-mosquitto-svc"
+      - name: "mongodb.host"
+        value: "sitewhere-mongodb"
+      - name: "mongodb.replicaset"
+        value: "rs0"
+      - name: "LOGGING_LEVEL_SITEWHERE"
+        value: "INFO"
+      - name: "LOGGING_LEVEL_SITEWHERE_GRPC"
+        value: "INFO"
+      - name: "LOGGING_LEVEL_SITEWHERE_KAFKA"
+        value: "INFO"
+      - name: "LOGGING_LEVEL_GRPC_INTERNAL"
+        value: "ERROR"
+      - name: "LOGGING_LEVEL_SPRING_BOOT"
+        value: "INFO"
+      - name: "LOGGING_LEVEL_SPRING_CONTEXT"
+        value: "INFO"
+      - name: "LOGGING_LEVEL_SPRING_SECURITY"
+        value: "INFO"
+      - name: "LOGGING_LEVEL_KAFKA"
+        value: "ERROR"
+      - name: "LOGGING_LEVEL_ZOOKEEPER"
+        value: "ERROR"
+      - name: "LOGGING_LEVEL_MONGODB"
+        value: "WARN"
+    resources:
+      limits:
+        memory: "800Mi"
+        cpu: "500m"
+      requests:
+        memory: "200Mi"
+        cpu: "100m"
+    readinessProbe:
+      exec:
+        command: ["/bin/grpc_health_probe", "-addr=:9003"]
+      initialDelaySeconds: 150
+    livenessProbe:
+      exec:
+        command: ["/bin/grpc_health_probe", "-addr=:9003"]
+      initialDelaySeconds:
+      periodSeconds: 60
+
+  serviceSpec:
+    type: LoadBalancer
+    ports:
+      - port: 9000
+        targetPort: 9000
+        protocol: TCP
+        name: grpc-api
+      - port: 9001
+        targetPort: 9001
+        protocol: TCP
+        name: grpc-management
+      - port: 9004
+        targetPort: 9004
+        protocol: TCP
+        name: grpc-user-management
+      - port: 9090
+        targetPort: 9090
+        protocol: TCP
+        name: http-metrics
+  debug:
+    enabled: false
+    jdwpPort: 8001
+    jmxPort: 1101

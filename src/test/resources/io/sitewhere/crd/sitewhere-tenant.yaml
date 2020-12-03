@@ -1,0 +1,17 @@
+apiVersion: sitewhere.io/v1alpha3
+kind: SiteWhereTenant
+metadata:
+  name: default
+  namespace: sitewhere
+spec:
+  name: Default Tenant
+  authenticationToken: sitewehere01234567890
+  authorizedUserIds:
+    - admin
+    - noadmin
+  configurationTemplate: mongodb
+  datasetTemplate: construction
+  branding:
+    imageUrl: https://s3.amazonaws.com/sitewhere-demo/sitewhere-small.png
+  metadata:
+    company: SiteWhere
