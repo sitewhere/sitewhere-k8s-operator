@@ -58,13 +58,6 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 
 	r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", "Bootstraping")
 
-	swInstance.Status.TenantManagementBootstrapState = sitewhereiov1alpha4.NotBootstrapped
-	swInstance.Status.UserManagementBootstrapState = sitewhereiov1alpha4.NotBootstrapped
-
-	if err := r.Status().Update(context.Background(), &swInstance); err != nil {
-		return ctrl.Result{}, err
-	}
-
 	// Reder Namespace base on the instance's name where the operator will be placing all of it's objectes for the instance.
 	namespace, err := RenderInstanceNamespace(&swInstance)
 	if err != nil {
