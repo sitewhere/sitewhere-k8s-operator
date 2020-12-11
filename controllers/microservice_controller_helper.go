@@ -104,6 +104,8 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice,
 	deploy *appsv1.Deployment) ([]*corev1.Service, error) {
 
+	var svcName = swMicroservice.Spec.FunctionalArea
+
 	var services = []*corev1.Service{
 		&corev1.Service{
 			TypeMeta: metav1.TypeMeta{
@@ -111,7 +113,7 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 				APIVersion: serviceAPIVersion,
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      swMicroservice.Name,
+				Name:      svcName,
 				Namespace: swMicroservice.Namespace,
 				Labels:    buildObjectMetaLabels(swInstance, swMicroservice),
 			},
