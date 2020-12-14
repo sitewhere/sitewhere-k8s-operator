@@ -271,54 +271,46 @@ func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereIns
 				},
 			},
 		},
-	}
-
-	// Handle Instance Management special case
-	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
-		var instanceManagementEnvVars = []corev1.EnvVar{
-			corev1.EnvVar{
-				Name:  "sitewhere.config.product.id",
-				Value: swInstance.Name,
-			},
-			corev1.EnvVar{
-				Name:  "sitewhere.config.keycloak.service.name",
-				Value: "sitewhere-keycloak-http",
-			},
-			corev1.EnvVar{
-				Name:  "sitewhere.config.keycloak.api.port",
-				Value: "80",
-			},
-			corev1.EnvVar{
-				Name:  "sitewhere.config.keycloak.realm",
-				Value: "sitewhere",
-			},
-			corev1.EnvVar{
-				Name:  "sitewhere.config.keycloak.master.realm",
-				Value: "master",
-			},
-			corev1.EnvVar{
-				Name:  "sitewhere.config.keycloak.master.username",
-				Value: "sitewhere",
-			},
-			corev1.EnvVar{
-				Name:  "sitewhere.config.keycloak.master.password",
-				Value: "sitewhere",
-			},
-			corev1.EnvVar{
-				Name: "sitewhere.config.keycloak.oidc.secret",
-				ValueFrom: &corev1.EnvVarSource{
-					SecretKeyRef: &corev1.SecretKeySelector{
-						LocalObjectReference: corev1.LocalObjectReference{
-							Name: swInstance.GetName(),
-						},
-						Key: clientSecretKey,
+		corev1.EnvVar{
+			Name:  "sitewhere.config.product.id",
+			Value: swInstance.Name,
+		},
+		corev1.EnvVar{
+			Name:  "sitewhere.config.keycloak.service.name",
+			Value: "sitewhere-keycloak-http",
+		},
+		corev1.EnvVar{
+			Name:  "sitewhere.config.keycloak.api.port",
+			Value: "80",
+		},
+		corev1.EnvVar{
+			Name:  "sitewhere.config.keycloak.realm",
+			Value: "sitewhere",
+		},
+		corev1.EnvVar{
+			Name:  "sitewhere.config.keycloak.master.realm",
+			Value: "master",
+		},
+		corev1.EnvVar{
+			Name:  "sitewhere.config.keycloak.master.username",
+			Value: "sitewhere",
+		},
+		corev1.EnvVar{
+			Name:  "sitewhere.config.keycloak.master.password",
+			Value: "sitewhere",
+		},
+		corev1.EnvVar{
+			Name: "sitewhere.config.keycloak.oidc.secret",
+			ValueFrom: &corev1.EnvVarSource{
+				SecretKeyRef: &corev1.SecretKeySelector{
+					LocalObjectReference: corev1.LocalObjectReference{
+						Name: swInstance.GetName(),
 					},
+					Key: clientSecretKey,
 				},
 			},
-		}
-		defaultEnvVars = append(defaultEnvVars, instanceManagementEnvVars...)
+		},
 	}
-
 	return defaultEnvVars
 }
 
