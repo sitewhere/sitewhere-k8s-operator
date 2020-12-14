@@ -18,6 +18,7 @@ package controllers
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-logr/logr"
 	core "k8s.io/api/core/v1"
@@ -74,8 +75,10 @@ func (r *SiteWhereTenantReconciler) Reconcile(req ctrl.Request) (ctrl.Result, er
 			// Set SiteWhereTenant as the owner and controller
 			ctrl.SetControllerReference(&swTenant, tenantEngine, r.Scheme)
 			if err := r.Create(ctx, tenantEngine); err != nil {
-				log.Error(err, "can not create tenant engine from tenant and microservice")
-				return ctrl.Result{}, err
+				if apierrors.IsNotFound(err) {
+					log.Info(fmt.Sprintf("Tenant Engine for Tenant %s and Microservice %s already exists", swTenant.GetName(), swMicroservice.Spec.FunctionalArea))
+				}
+				return ctrl.Result{}, client.IgnoreNotFound(err)
 			}
 		}
 	}
