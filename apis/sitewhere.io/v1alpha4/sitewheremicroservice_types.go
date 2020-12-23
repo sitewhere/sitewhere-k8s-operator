@@ -58,7 +58,14 @@ type SiteWhereMicroserviceSpec struct {
 	// Multitenant indicates whether microservice has tenant engines
 	Multitenant bool `json:"multitenant,omitempty"`
 
+	// DockerSpec is the Docker specification of the microservice.
+	// If this value is set a the microservice level, it will override
+	// the value set at the instance level.
+	// +optional
+	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
+
 	// Configuration is the configuration of the microservice
+	// +optional
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
 

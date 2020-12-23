@@ -223,6 +223,9 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	if swInstance.Spec.DockerSpec != nil {
 		dockerSpec = swInstance.Spec.DockerSpec
 	}
+	if swMicroservice.Spec.DockerSpec != nil {
+		dockerSpec = swMicroservice.Spec.DockerSpec
+	}
 
 	var imageName = fmt.Sprintf("%s/%s/service-%s:%s",
 		dockerSpec.Registry,

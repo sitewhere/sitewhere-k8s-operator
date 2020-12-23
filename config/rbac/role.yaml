@@ -22,7 +22,6 @@ rules:
   - ""
   resources:
   - services
-  - configmaps
   verbs:
   - create
   - delet
