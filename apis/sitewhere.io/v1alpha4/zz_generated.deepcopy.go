@@ -137,7 +137,11 @@ func (in *MicroservicePodSpecification) DeepCopyInto(out *MicroservicePodSpecifi
 			(*in)[i].DeepCopyInto(&(*out)[i])
 		}
 	}
-	in.Resources.DeepCopyInto(&out.Resources)
+	if in.Resources != nil {
+		in, out := &in.Resources, &out.Resources
+		*out = new(v1.ResourceRequirements)
+		(*in).DeepCopyInto(*out)
+	}
 	if in.LivenessProbe != nil {
 		in, out := &in.LivenessProbe, &out.LivenessProbe
 		*out = new(v1.Probe)

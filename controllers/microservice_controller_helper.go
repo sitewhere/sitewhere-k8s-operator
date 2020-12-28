@@ -24,6 +24,7 @@ import (
 	"github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -77,6 +78,18 @@ var (
 		corev1.ContainerPort{
 			ContainerPort: 9090,
 			Protocol:      corev1.ProtocolTCP,
+		},
+	}
+
+	// DefaultContainerResources are the resources of the microservices
+	DefaultContainerResources = corev1.ResourceRequirements{
+		Requests: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("0.5"),
+			corev1.ResourceMemory: resource.MustParse("500Mi"),
+		},
+		Limits: corev1.ResourceList{
+			corev1.ResourceCPU:    resource.MustParse("2"),
+			corev1.ResourceMemory: resource.MustParse("2Gi"),
 		},
 	}
 )
@@ -247,6 +260,7 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	var envVars = renderDeploymentPodSpecEnvVars(swInstance, swMicroservice)
 	var containerPorts = renderDeploymentPodSpecContainerPorts(swInstance, swMicroservice)
 	var containerImagePullPolicy = renderContainerImagePullPolicy(swInstance, swMicroservice)
+	var containeResources = renderContainerResources(swInstance, swMicroservice)
 
 	return corev1.PodSpec{
 		ServiceAccountName: swInstance.GetName(),
@@ -257,6 +271,7 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 				ImagePullPolicy: containerImagePullPolicy,
 				Ports:           containerPorts,
 				Env:             envVars,
+				Resources:       containeResources,
 			},
 		},
 	}
@@ -289,7 +304,7 @@ func renderContainerImageName(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 
 func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) []corev1.EnvVar {
-	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.Env != "" {
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.Env != nil {
 		return swMicroservice.Spec.PodSpec.Env
 	}
 	return renderDefaultDeploymentPodSpecEnvVars(swInstance, swMicroservice)
@@ -391,4 +406,12 @@ func renderContainerImagePullPolicy(swInstance *sitewhereiov1alpha4.SiteWhereIns
 		return swMicroservice.Spec.PodSpec.ImagePullPolicy
 	}
 	return DefaultImagePullPolicy
+}
+
+func renderContainerResources(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) corev1.ResourceRequirements {
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.Resources != nil {
+		return *swMicroservice.Spec.PodSpec.Resources
+	}
+	return DefaultContainerResources
 }
