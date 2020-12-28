@@ -289,8 +289,15 @@ func renderContainerImageName(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 
 func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) []corev1.EnvVar {
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.Env != "" {
+		return swMicroservice.Spec.PodSpec.Env
+	}
+	return renderDefaultDeploymentPodSpecEnvVars(swInstance, swMicroservice)
+}
 
-	var defaultEnvVars = []corev1.EnvVar{
+func renderDefaultDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) []corev1.EnvVar {
+	return []corev1.EnvVar{
 		corev1.EnvVar{
 			Name:  "sitewhere.config.k8s.name",
 			Value: swMicroservice.Spec.FunctionalArea,
@@ -353,7 +360,6 @@ func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereIns
 			},
 		},
 	}
-	return defaultEnvVars
 }
 
 func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
