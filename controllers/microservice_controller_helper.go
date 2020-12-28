@@ -60,12 +60,21 @@ var (
 	serviceAPIVersion    = corev1.SchemeGroupVersion.String()
 )
 
+var (
+	defaultPodAnnotations = map[string]string{
+		"prometheus.io/port":   "9090",
+		"prometheus.io/scheme": "http",
+		"prometheus.io/scrape": "true",
+	}
+)
+
 //RenderMicroservicesDeployment derives apps.Deployment from a SiteWhereMicroservice
 func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInstance, swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*appsv1.Deployment, error) {
 
 	var labelsSelectorMap = buildLabelsSelectors(swInstance, swMicroservice)
 
 	var podSpec = renderDeploymentPodSpec(swInstance, swMicroservice)
+	var podAnnotations = renderPodAnnotations(swInstance, swMicroservice)
 
 	var deployment = &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
@@ -84,12 +93,8 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 			},
 			Template: corev1.PodTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
-					Labels: labelsSelectorMap,
-					Annotations: map[string]string{
-						"prometheus.io/port":   "9090",
-						"prometheus.io/scheme": "http",
-						"prometheus.io/scrape": "true",
-					},
+					Labels:      labelsSelectorMap,
+					Annotations: podAnnotations,
 				},
 				Spec: podSpec,
 			},
@@ -242,6 +247,14 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 			},
 		},
 	}
+}
+
+func renderPodAnnotations(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) map[string]string {
+	if swMicroservice == nil || swMicroservice.Spec.PodSpec == nil {
+		return defaultPodAnnotations
+	}
+	return swMicroservice.Spec.PodSpec.Annotations
 }
 
 func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
