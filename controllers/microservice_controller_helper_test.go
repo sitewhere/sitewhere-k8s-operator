@@ -18,9 +18,11 @@ package controllers
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
@@ -317,4 +319,99 @@ func compareContainerPorts(lhs []corev1.ContainerPort, rhs []corev1.ContainerPor
 
 func compareContainerPort(lhs corev1.ContainerPort, rhs corev1.ContainerPort) bool {
 	return (lhs.ContainerPort == rhs.ContainerPort) && (lhs.Protocol == rhs.Protocol)
+}
+
+func TestRenderContainerResources(t *testing.T) {
+	t.Parallel()
+	data := []struct {
+		name           string
+		swInstance     *sitewhereiov1alpha4.SiteWhereInstance
+		swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice
+		result         corev1.ResourceRequirements
+	}{
+		{
+			name: "when_no_podspec_return_default",
+			swInstance: &sitewhereiov1alpha4.SiteWhereInstance{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					Namespace: "test",
+				},
+				Spec: sitewhereiov1alpha4.SiteWhereInstanceSpec{},
+			},
+			swMicroservice: &sitewhereiov1alpha4.SiteWhereMicroservice{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "some",
+					Namespace: "test",
+				},
+				Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
+					FunctionalArea: "some",
+				},
+			},
+			result: DefaultContainerResources,
+		},
+		{
+			name: "when_podspec_override_return_override",
+			swInstance: &sitewhereiov1alpha4.SiteWhereInstance{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "test",
+					Namespace: "test",
+				},
+				Spec: sitewhereiov1alpha4.SiteWhereInstanceSpec{},
+			},
+			swMicroservice: &sitewhereiov1alpha4.SiteWhereMicroservice{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "some",
+					Namespace: "test",
+				},
+				Spec: sitewhereiov1alpha4.SiteWhereMicroserviceSpec{
+					FunctionalArea: "some",
+					PodSpec: &sitewhereiov1alpha4.MicroservicePodSpecification{
+						Resources: &corev1.ResourceRequirements{
+							Requests: corev1.ResourceList{
+								corev1.ResourceCPU:    resource.MustParse("1"),
+								corev1.ResourceMemory: resource.MustParse("1Gi"),
+							},
+							Limits: corev1.ResourceList{
+								corev1.ResourceCPU:    resource.MustParse("4"),
+								corev1.ResourceMemory: resource.MustParse("4Gi"),
+							},
+						},
+					},
+				},
+			},
+			result: corev1.ResourceRequirements{
+				Requests: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("1"),
+					corev1.ResourceMemory: resource.MustParse("1Gi"),
+				},
+				Limits: corev1.ResourceList{
+					corev1.ResourceCPU:    resource.MustParse("4"),
+					corev1.ResourceMemory: resource.MustParse("4Gi"),
+				},
+			},
+		},
+	}
+	for _, single := range data {
+		t.Run(single.name, func(single struct {
+			name           string
+			swInstance     *sitewhereiov1alpha4.SiteWhereInstance
+			swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice
+			result         corev1.ResourceRequirements
+		}) func(t *testing.T) {
+			return func(t *testing.T) {
+				result := renderContainerResources(single.swInstance, single.swMicroservice)
+				if !compareContainerResources(result.Limits, single.result.Limits) {
+					t.Fatalf("expected %v limits, got %v", result, single.result)
+				}
+				if !compareContainerResources(result.Requests, single.result.Requests) {
+					t.Fatalf("expected %v requests, got %v", result, single.result)
+				}
+			}
+		}(single))
+	}
+}
+
+func compareContainerResources(lhs corev1.ResourceList, rhs corev1.ResourceList) bool {
+	eq := reflect.DeepEqual(lhs, rhs)
+	return eq
 }

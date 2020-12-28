@@ -92,6 +92,31 @@ var (
 			corev1.ResourceMemory: resource.MustParse("2Gi"),
 		},
 	}
+
+	// DefaultLivenessProbe is the default Liveness Probe
+	DefaultLivenessProbe = &corev1.Probe{
+		Handler: corev1.Handler{
+			Exec: &corev1.ExecAction{
+				Command: []string{
+					"/bin/grpc_health_probe", "-addr=:9003", //ok?
+				},
+			},
+		},
+		InitialDelaySeconds: 350,
+		PeriodSeconds:       60,
+	}
+
+	// DefaultRedinessProbe is the default rediness probe
+	DefaultRedinessProbe = &corev1.Probe{
+		Handler: corev1.Handler{
+			Exec: &corev1.ExecAction{
+				Command: []string{
+					"/bin/grpc_health_probe", "-addr=:9003", //ok?
+				},
+			},
+		},
+		InitialDelaySeconds: 150,
+	}
 )
 
 const (
@@ -261,6 +286,8 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	var containerPorts = renderDeploymentPodSpecContainerPorts(swInstance, swMicroservice)
 	var containerImagePullPolicy = renderContainerImagePullPolicy(swInstance, swMicroservice)
 	var containeResources = renderContainerResources(swInstance, swMicroservice)
+	var containerRedinessProbe = renderContainerRedinessProbe(swInstance, swMicroservice)
+	var containerLivenessProbe = renderContainerLivenessProbe(swInstance, swMicroservice)
 
 	return corev1.PodSpec{
 		ServiceAccountName: swInstance.GetName(),
@@ -272,6 +299,8 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 				Ports:           containerPorts,
 				Env:             envVars,
 				Resources:       containeResources,
+				ReadinessProbe:  containerRedinessProbe,
+				LivenessProbe:   containerLivenessProbe,
 			},
 		},
 	}
@@ -414,4 +443,20 @@ func renderContainerResources(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 		return *swMicroservice.Spec.PodSpec.Resources
 	}
 	return DefaultContainerResources
+}
+
+func renderContainerRedinessProbe(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) *corev1.Probe {
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.ReadinessProbe != nil {
+		return swMicroservice.Spec.PodSpec.ReadinessProbe
+	}
+	return DefaultRedinessProbe
+}
+
+func renderContainerLivenessProbe(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) *corev1.Probe {
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.LivenessProbe != nil {
+		return swMicroservice.Spec.PodSpec.LivenessProbe
+	}
+	return DefaultLivenessProbe
 }
