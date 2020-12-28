@@ -68,6 +68,11 @@ var (
 	}
 )
 
+const (
+	// DefaultImagePullPolicy is SiteWhere operator default image pull policy
+	DefaultImagePullPolicy = corev1.PullIfNotPresent
+)
+
 //RenderMicroservicesDeployment derives apps.Deployment from a SiteWhereMicroservice
 func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInstance, swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) (*appsv1.Deployment, error) {
 
@@ -228,14 +233,17 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 
 	var envVars = renderDeploymentPodSpecEnvVars(swInstance, swMicroservice)
 	var containerPorts = renderDeploymentPodSpecContainerPorts(swInstance, swMicroservice)
+	var containerImagePullPolicy = renderContainerImagePullPolicy(swInstance, swMicroservice)
+
 	return corev1.PodSpec{
 		ServiceAccountName: swInstance.GetName(),
 		Containers: []corev1.Container{
 			corev1.Container{
-				Name:  swMicroservice.GetName(),
-				Image: imageName,
-				Ports: containerPorts,
-				Env:   envVars,
+				Name:            swMicroservice.GetName(),
+				Image:           imageName,
+				ImagePullPolicy: containerImagePullPolicy,
+				Ports:           containerPorts,
+				Env:             envVars,
 			},
 		},
 	}
@@ -361,4 +369,12 @@ func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteW
 	}
 
 	return defaultContainerPorts
+}
+
+func renderContainerImagePullPolicy(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) corev1.PullPolicy {
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.ImagePullPolicy != "" {
+		return swMicroservice.Spec.PodSpec.ImagePullPolicy
+	}
+	return DefaultImagePullPolicy
 }
