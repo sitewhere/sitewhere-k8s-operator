@@ -224,15 +224,7 @@ func buildLabelsSelectors(
 func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) corev1.PodSpec {
 
-	var dockerSpec = sitewhereiov1alpha4.DefaultDockerSpec
-	if swInstance.Spec.DockerSpec != nil {
-		dockerSpec = swInstance.Spec.DockerSpec
-	}
-	var imageName = fmt.Sprintf("%s/%s/service-%s:%s",
-		dockerSpec.Registry,
-		dockerSpec.Repository,
-		swMicroservice.GetName(),
-		dockerSpec.Tag)
+	var imageName = renderContainerImageName(swInstance, swMicroservice)
 
 	var envVars = renderDeploymentPodSpecEnvVars(swInstance, swMicroservice)
 	var containerPorts = renderDeploymentPodSpecContainerPorts(swInstance, swMicroservice)
@@ -255,6 +247,23 @@ func renderPodAnnotations(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 		return defaultPodAnnotations
 	}
 	return swMicroservice.Spec.PodSpec.Annotations
+}
+
+func renderContainerImageName(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) string {
+	var dockerSpec = sitewhereiov1alpha4.DefaultDockerSpec
+	if swInstance.Spec.DockerSpec != nil {
+		dockerSpec = swInstance.Spec.DockerSpec
+	}
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.DockerSpec != nil {
+		dockerSpec = swMicroservice.Spec.PodSpec.DockerSpec
+	}
+	var imageName = fmt.Sprintf("%s/%s/service-%s:%s",
+		dockerSpec.Registry,
+		dockerSpec.Repository,
+		swMicroservice.GetName(),
+		dockerSpec.Tag)
+	return imageName
 }
 
 func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
