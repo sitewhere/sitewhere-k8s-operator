@@ -61,10 +61,23 @@ var (
 )
 
 var (
-	defaultPodAnnotations = map[string]string{
+	// DefaultPodAnnotations are the defaults annotations of microservice pod
+	DefaultPodAnnotations = map[string]string{
 		"prometheus.io/port":   "9090",
 		"prometheus.io/scheme": "http",
 		"prometheus.io/scrape": "true",
+	}
+
+	// DefaultContainerPorts are the defaults ports of a microservice
+	DefaultContainerPorts = []corev1.ContainerPort{
+		corev1.ContainerPort{
+			ContainerPort: 9000,
+			Protocol:      corev1.ProtocolTCP,
+		},
+		corev1.ContainerPort{
+			ContainerPort: 9090,
+			Protocol:      corev1.ProtocolTCP,
+		},
 	}
 )
 
@@ -252,7 +265,7 @@ func renderDeploymentPodSpec(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 func renderPodAnnotations(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) map[string]string {
 	if swMicroservice == nil || swMicroservice.Spec.PodSpec == nil {
-		return defaultPodAnnotations
+		return DefaultPodAnnotations
 	}
 	return swMicroservice.Spec.PodSpec.Annotations
 }
@@ -346,15 +359,10 @@ func renderDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteWhereIns
 func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
 	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice) []corev1.ContainerPort {
 
-	var defaultContainerPorts = []corev1.ContainerPort{
-		corev1.ContainerPort{
-			ContainerPort: 9000,
-			Protocol:      corev1.ProtocolTCP,
-		},
-		corev1.ContainerPort{
-			ContainerPort: 9090,
-			Protocol:      corev1.ProtocolTCP,
-		},
+	var containerPorts = DefaultContainerPorts
+
+	if swMicroservice.Spec.PodSpec != nil && swMicroservice.Spec.PodSpec.Ports != nil {
+		containerPorts = swMicroservice.Spec.PodSpec.Ports
 	}
 
 	// Handle Instance Management special case
@@ -365,10 +373,10 @@ func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteW
 				Protocol:      corev1.ProtocolTCP,
 			},
 		}
-		defaultContainerPorts = append(defaultContainerPorts, instanceMangementContinerPorts...)
+		containerPorts = append(containerPorts, instanceMangementContinerPorts...)
 	}
 
-	return defaultContainerPorts
+	return containerPorts
 }
 
 func renderContainerImagePullPolicy(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
