@@ -134,7 +134,7 @@ type MicroserviceServiceSpecification struct {
 	// to the clusterIP.
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 	// +optional
-	Type corev1.ServiceType `json:"type,omitempty" protobuf:"bytes,4,opt,name=type,casttype=ServiceType"`
+	Type *corev1.ServiceType `json:"type,omitempty" protobuf:"bytes,4,opt,name=type,casttype=ServiceType"`
 }
 
 // MicroserviceLoggingEntry is the logging level

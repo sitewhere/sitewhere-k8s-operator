@@ -94,7 +94,8 @@ var (
 	}
 
 	// DefaultLivenessProbe is the default Liveness Probe
-	DefaultLivenessProbe = &corev1.Probe{
+	DefaultLivenessProbe *corev1.Probe = nil
+	/*&corev1.Probe{
 		Handler: corev1.Handler{
 			Exec: &corev1.ExecAction{
 				Command: []string{
@@ -104,10 +105,11 @@ var (
 		},
 		InitialDelaySeconds: 350,
 		PeriodSeconds:       60,
-	}
+	}*/
 
 	// DefaultRedinessProbe is the default rediness probe
-	DefaultRedinessProbe = &corev1.Probe{
+	DefaultRedinessProbe *corev1.Probe = nil
+	/*&corev1.Probe{
 		Handler: corev1.Handler{
 			Exec: &corev1.ExecAction{
 				Command: []string{
@@ -116,12 +118,31 @@ var (
 			},
 		},
 		InitialDelaySeconds: 150,
+	}*/
+
+	// DefaultServicePorts are the defaults service ports of the microservice
+	DefaultServicePorts = []corev1.ServicePort{
+		corev1.ServicePort{
+			Name:       "grpc-api",
+			Port:       9000,
+			Protocol:   corev1.ProtocolTCP,
+			TargetPort: intstr.IntOrString{IntVal: 9000},
+		},
+		corev1.ServicePort{
+			Name:       "http-metrics",
+			Port:       9090,
+			Protocol:   corev1.ProtocolTCP,
+			TargetPort: intstr.IntOrString{IntVal: 9090},
+		},
 	}
 )
 
 const (
 	// DefaultImagePullPolicy is SiteWhere operator default image pull policy
 	DefaultImagePullPolicy = corev1.PullIfNotPresent
+
+	// DefaultServiceType is the default service type
+	DefaultServiceType = corev1.ServiceTypeClusterIP
 )
 
 //RenderMicroservicesDeployment derives apps.Deployment from a SiteWhereMicroservice
@@ -167,6 +188,9 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 
 	var svcName = swMicroservice.Spec.FunctionalArea
 
+	var serviceType = renderServiceType(swInstance, swMicroservice, deploy)
+	var servicePorts = renderServicePorts(swInstance, swMicroservice, deploy)
+
 	var services = []*corev1.Service{
 		&corev1.Service{
 			TypeMeta: metav1.TypeMeta{
@@ -180,21 +204,8 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 			},
 			Spec: corev1.ServiceSpec{
 				Selector: deploy.Spec.Selector.MatchLabels,
-				Type:     corev1.ServiceTypeClusterIP,
-				Ports: []corev1.ServicePort{
-					corev1.ServicePort{
-						Name:       "grpc-api",
-						Port:       9000,
-						Protocol:   corev1.ProtocolTCP,
-						TargetPort: intstr.IntOrString{IntVal: 9000},
-					},
-					corev1.ServicePort{
-						Name:       "http-metrics",
-						Port:       9090,
-						Protocol:   corev1.ProtocolTCP,
-						TargetPort: intstr.IntOrString{IntVal: 9090},
-					},
-				},
+				Type:     serviceType,
+				Ports:    servicePorts,
 			},
 		},
 	}
@@ -459,4 +470,22 @@ func renderContainerLivenessProbe(swInstance *sitewhereiov1alpha4.SiteWhereInsta
 		return swMicroservice.Spec.PodSpec.LivenessProbe
 	}
 	return DefaultLivenessProbe
+}
+
+func renderServiceType(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice,
+	deploy *appsv1.Deployment) corev1.ServiceType {
+	if swMicroservice.Spec.SerivceSpec != nil && swMicroservice.Spec.SerivceSpec.Type != nil {
+		return *swMicroservice.Spec.SerivceSpec.Type
+	}
+	return DefaultServiceType
+}
+
+func renderServicePorts(swInstance *sitewhereiov1alpha4.SiteWhereInstance,
+	swMicroservice *sitewhereiov1alpha4.SiteWhereMicroservice,
+	deploy *appsv1.Deployment) []corev1.ServicePort {
+	if swMicroservice.Spec.SerivceSpec != nil && swMicroservice.Spec.SerivceSpec.Ports != nil {
+		return swMicroservice.Spec.SerivceSpec.Ports
+	}
+	return DefaultServicePorts
 }
