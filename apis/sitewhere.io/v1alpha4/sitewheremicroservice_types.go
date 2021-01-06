@@ -78,7 +78,6 @@ type MicroservicePodSpecification struct {
 	// +patchStrategy=merge
 	// +listType=map
 	// +listMapKey=containerPort
-	// +listMapKey=protocol
 	Ports []corev1.ContainerPort `json:"ports,omitempty" patchStrategy:"merge" patchMergeKey:"containerPort" protobuf:"bytes,6,rep,name=ports"`
 
 	// List of environment variables to set in the container.
@@ -116,7 +115,6 @@ type MicroserviceServiceSpecification struct {
 	// +patchStrategy=merge
 	// +listType=map
 	// +listMapKey=port
-	// +listMapKey=protocol
 	Ports []corev1.ServicePort `json:"ports,omitempty" patchStrategy:"merge" patchMergeKey:"port" protobuf:"bytes,1,rep,name=ports"`
 
 	// type determines how the Service is exposed. Defaults to ClusterIP. Valid

@@ -21,6 +21,7 @@ limitations under the License.
 package v1alpha4
 
 import (
+	"github.com/sitewhere/sitewhere-k8s-operator/pkg/funcarea"
 	"k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 )
@@ -262,6 +263,11 @@ func (in *SiteWhereInstanceSpec) DeepCopyInto(out *SiteWhereInstanceSpec) {
 		in, out := &in.Configuration, &out.Configuration
 		*out = new(runtime.RawExtension)
 		(*in).DeepCopyInto(*out)
+	}
+	if in.FunctionalAreas != nil {
+		in, out := &in.FunctionalAreas, &out.FunctionalAreas
+		*out = make([]funcarea.FunctionalArea, len(*in))
+		copy(*out, *in)
 	}
 }
 

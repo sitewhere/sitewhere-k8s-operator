@@ -19,6 +19,8 @@ package v1alpha4
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
+
+	"github.com/sitewhere/sitewhere-k8s-operator/pkg/funcarea"
 )
 
 // BootstrapState State values for bootstrapping a component.
@@ -71,6 +73,8 @@ type SiteWhereInstanceSpec struct {
 	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
 	// Configuration is the configuration of the instance
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
+	// FunctionalAreas microservices to create
+	FunctionalAreas []funcarea.FunctionalArea `json:"functionalAreas,omitempty"`
 }
 
 // SiteWhereInstanceStatus defines the observed state of SiteWhereInstance

@@ -23,6 +23,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+
+	"github.com/sitewhere/sitewhere-k8s-operator/pkg/funcarea"
 )
 
 var (
@@ -37,8 +39,6 @@ func (r *SiteWhereInstance) SetupWebhookWithManager(mgr ctrl.Manager) error {
 		For(r).
 		Complete()
 }
-
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 
 // +kubebuilder:webhook:path=/mutate-sitewhere-io-v1alpha4-sitewhereinstance,mutating=true,failurePolicy=fail,groups=sitewhere.io,resources=instances,verbs=create;update,versions=v1alpha4,name=msitewhereinstance.kb.io
 
@@ -64,6 +64,13 @@ func (r *SiteWhereInstance) Default() {
 			r.Spec.DockerSpec.Tag = defaultTag
 		}
 	}
+	if r.Spec.FunctionalAreas == nil {
+		sitewhereinstancelog.Info("Updateing", "FunctionalAreas", r.Name)
+		r.Spec.FunctionalAreas = funcarea.DefaultFunctionalAreas
+	}
+	if !funcarea.HasFunctionalArea(r.Spec.FunctionalAreas, funcarea.FunctionalAreaInstanceManagement) {
+		r.Spec.FunctionalAreas = append(r.Spec.FunctionalAreas, funcarea.FunctionalAreaInstanceManagement)
+	}
 }
 
 // TODO(user): change verbs to "verbs=create;update;delete" if you want to enable deletion validation.
@@ -78,9 +85,9 @@ func (r *SiteWhereInstance) ValidateCreate() error {
 	// Here we need to validate the name of the SiteWhereInstance, since the Namespace create
 	// should not exists
 	if stringInSlice(r.Name, invalidSiteWhereInstanceNames[:]) {
-		return errors.New("Cluster size must be an odd number")
-
+		return errors.New("SiteWhere instance name must be valid")
 	}
+
 	return nil
 }
 
@@ -88,7 +95,6 @@ func (r *SiteWhereInstance) ValidateCreate() error {
 func (r *SiteWhereInstance) ValidateUpdate(old runtime.Object) error {
 	sitewhereinstancelog.Info("validate update", "name", r.Name)
 
-	// TODO(user): fill in your validation logic upon object update.
 	return nil
 }
 
@@ -96,7 +102,6 @@ func (r *SiteWhereInstance) ValidateUpdate(old runtime.Object) error {
 func (r *SiteWhereInstance) ValidateDelete() error {
 	sitewhereinstancelog.Info("validate delete", "name", r.Name)
 
-	// TODO(user): fill in your validation logic upon object deletion.
 	return nil
 }
 
