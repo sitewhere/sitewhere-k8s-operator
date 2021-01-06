@@ -53,7 +53,7 @@ func RenderTenantEngine(ctx context.Context, client client.Client, swTenant *sit
 			Labels: map[string]string{
 				sitewhereLabelTenant:         swTenant.ObjectMeta.Name,
 				sitewhereLabelMicroservice:   swMicroservice.ObjectMeta.Name,
-				sitewhereLabelFunctionalArea: swMicroservice.Spec.FunctionalArea,
+				sitewhereLabelFunctionalArea: string(swMicroservice.Spec.FunctionalArea),
 			},
 		},
 		Spec: sitewhereiov1alpha4.SiteWhereTenantEngineSpec{
@@ -73,7 +73,7 @@ func FindTenantEngineConfigurationTemplate(ctx context.Context,
 		return nil, err
 	}
 
-	var key = strcase.ToLowerCamel(swMicroservice.Spec.FunctionalArea)
+	var key = strcase.ToLowerCamel(string(swMicroservice.Spec.FunctionalArea))
 	var name = tenantTemplate.Spec.TenantEngineTemplates[key]
 
 	var tenantEngineTemplate = &templatesv1alpha4.TenantEngineConfigurationTemplate{}

@@ -30,6 +30,8 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
+	"github.com/sitewhere/sitewhere-k8s-operator/pkg/funcarea"
+
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
 )
 
@@ -198,7 +200,7 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 				APIVersion: serviceAPIVersion,
 			},
 			ObjectMeta: metav1.ObjectMeta{
-				Name:      svcName,
+				Name:      string(svcName),
 				Namespace: swMicroservice.Namespace,
 				Labels:    buildObjectMetaLabels(swInstance, swMicroservice),
 			},
@@ -211,7 +213,7 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 	}
 
 	// Handle Instance Management special case
-	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
+	if swMicroservice.GetName() == string(funcarea.FunctionalAreaInstanceManagement) {
 		var service = &corev1.Service{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       serviceKind,
@@ -355,7 +357,7 @@ func renderDefaultDeploymentPodSpecEnvVars(swInstance *sitewhereiov1alpha4.SiteW
 	return []corev1.EnvVar{
 		corev1.EnvVar{
 			Name:  "sitewhere.config.k8s.name",
-			Value: swMicroservice.Spec.FunctionalArea,
+			Value: string(swMicroservice.Spec.FunctionalArea),
 		},
 		corev1.EnvVar{
 			Name: "sitewhere.config.k8s.namespace",
@@ -427,7 +429,7 @@ func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteW
 	}
 
 	// Handle Instance Management special case
-	if swMicroservice.GetName() == FunctionalAreaInstanceManagement {
+	if swMicroservice.GetName() == string(funcarea.FunctionalAreaInstanceManagement) {
 		var instanceMangementContinerPorts = []corev1.ContainerPort{
 			corev1.ContainerPort{
 				ContainerPort: 8080,
