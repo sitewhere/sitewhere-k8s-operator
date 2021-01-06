@@ -346,7 +346,6 @@ spec:
                     definition. Cannot be updated. More info: http://kubernetes.io/docs/user-guide/identifiers#names'
                   type: string
                 ports:
-                  default: TCP
                   description: List of ports to expose from the container. Exposing
                     a port here gives the system additional information about the
                     network connections a container uses, but is primarily informational.
@@ -389,7 +388,6 @@ spec:
                   type: array
                   x-kubernetes-list-map-keys:
                   - containerPort
-                  - protocol
                   x-kubernetes-list-type: map
                 readinessProbe:
                   description: 'Periodic probe of container service readiness. Container
@@ -598,7 +596,6 @@ spec:
                   type: array
                   x-kubernetes-list-map-keys:
                   - port
-                  - protocol
                   x-kubernetes-list-type: map
                 type:
                   description: 'type determines how the Service is exposed. Defaults

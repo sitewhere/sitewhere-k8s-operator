@@ -30,8 +30,6 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
-	"github.com/sitewhere/sitewhere-k8s-operator/pkg/funcarea"
-
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
 )
 
@@ -213,7 +211,7 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 	}
 
 	// Handle Instance Management special case
-	if swMicroservice.GetName() == string(funcarea.FunctionalAreaInstanceManagement) {
+	if swMicroservice.GetName() == "instance-management" {
 		var service = &corev1.Service{
 			TypeMeta: metav1.TypeMeta{
 				Kind:       serviceKind,
@@ -429,7 +427,7 @@ func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteW
 	}
 
 	// Handle Instance Management special case
-	if swMicroservice.GetName() == string(funcarea.FunctionalAreaInstanceManagement) {
+	if swMicroservice.GetName() == "instance-management" {
 		var instanceMangementContinerPorts = []corev1.ContainerPort{
 			corev1.ContainerPort{
 				ContainerPort: 8080,

@@ -20,8 +20,6 @@ import (
 	corev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
-
-	"github.com/sitewhere/sitewhere-k8s-operator/pkg/funcarea"
 )
 
 // UserManagementConfiguration is the configuration for User Management
@@ -166,7 +164,7 @@ type InstanceMangementConfiguration struct {
 // SiteWhereMicroserviceSpec defines the desired state of SiteWhereMicroservice
 type SiteWhereMicroserviceSpec struct {
 	// Functional Area
-	FunctionalArea funcarea.FunctionalArea `json:"functionalArea,omitempty"`
+	FunctionalArea string `json:"functionalArea,omitempty"`
 
 	// Name is the name displayed for microservice
 	Name string `json:"name,omitempty"`

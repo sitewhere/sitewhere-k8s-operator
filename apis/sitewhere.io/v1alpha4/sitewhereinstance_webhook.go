@@ -23,8 +23,6 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
-
-	"github.com/sitewhere/sitewhere-k8s-operator/pkg/funcarea"
 )
 
 var (
@@ -63,13 +61,6 @@ func (r *SiteWhereInstance) Default() {
 			sitewhereinstancelog.Info("Updateing", "DockerSpec.Tag", r.Name)
 			r.Spec.DockerSpec.Tag = defaultTag
 		}
-	}
-	if r.Spec.FunctionalAreas == nil {
-		sitewhereinstancelog.Info("Updateing", "FunctionalAreas", r.Name)
-		r.Spec.FunctionalAreas = funcarea.DefaultFunctionalAreas
-	}
-	if !funcarea.HasFunctionalArea(r.Spec.FunctionalAreas, funcarea.FunctionalAreaInstanceManagement) {
-		r.Spec.FunctionalAreas = append(r.Spec.FunctionalAreas, funcarea.FunctionalAreaInstanceManagement)
 	}
 }
 
