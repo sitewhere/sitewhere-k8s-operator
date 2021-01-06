@@ -24,7 +24,7 @@ import (
 	"github.com/pkg/errors"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/api/resource"
+	//	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/intstr"
@@ -82,7 +82,8 @@ var (
 	}
 
 	// DefaultContainerResources are the resources of the microservices
-	DefaultContainerResources = corev1.ResourceRequirements{
+	DefaultContainerResources = corev1.ResourceRequirements{}
+	/*corev1.ResourceRequirements{
 		Requests: corev1.ResourceList{
 			corev1.ResourceCPU:    resource.MustParse("0.5"),
 			corev1.ResourceMemory: resource.MustParse("500Mi"),
@@ -91,7 +92,7 @@ var (
 			corev1.ResourceCPU:    resource.MustParse("2"),
 			corev1.ResourceMemory: resource.MustParse("2Gi"),
 		},
-	}
+	}*/
 
 	// DefaultLivenessProbe is the default Liveness Probe
 	DefaultLivenessProbe *corev1.Probe = nil
@@ -212,30 +213,45 @@ func RenderMicroservicesService(swInstance *sitewhereiov1alpha4.SiteWhereInstanc
 
 	// Handle Instance Management special case
 	if swMicroservice.GetName() == "instance-management" {
-		var service = &corev1.Service{
-			TypeMeta: metav1.TypeMeta{
-				Kind:       serviceKind,
-				APIVersion: serviceAPIVersion,
-			},
-			ObjectMeta: metav1.ObjectMeta{
-				Name:      fmt.Sprintf("%s-rest", swMicroservice.Name),
-				Namespace: swMicroservice.Namespace,
-				Labels:    buildObjectMetaLabels(swInstance, swMicroservice),
-			},
-			Spec: corev1.ServiceSpec{
-				Selector: deploy.Spec.Selector.MatchLabels,
-				Type:     corev1.ServiceTypeLoadBalancer,
-				Ports: []corev1.ServicePort{
-					corev1.ServicePort{
-						Name:       "http-rest",
-						Port:       8080,
-						Protocol:   corev1.ProtocolTCP,
-						TargetPort: intstr.IntOrString{IntVal: 8080},
+		var hasExtraPort bool = false
+
+		for _, s := range services {
+			for _, sp := range s.Spec.Ports {
+				if sp.Port == 8080 && sp.Protocol == corev1.ProtocolTCP {
+					hasExtraPort = true
+					break
+				}
+			}
+			if hasExtraPort {
+				break
+			}
+		}
+		if !hasExtraPort {
+			var service = &corev1.Service{
+				TypeMeta: metav1.TypeMeta{
+					Kind:       serviceKind,
+					APIVersion: serviceAPIVersion,
+				},
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      fmt.Sprintf("%s-rest", swMicroservice.Name),
+					Namespace: swMicroservice.Namespace,
+					Labels:    buildObjectMetaLabels(swInstance, swMicroservice),
+				},
+				Spec: corev1.ServiceSpec{
+					Selector: deploy.Spec.Selector.MatchLabels,
+					Type:     corev1.ServiceTypeLoadBalancer,
+					Ports: []corev1.ServicePort{
+						corev1.ServicePort{
+							Name:       "http-rest",
+							Port:       8080,
+							Protocol:   corev1.ProtocolTCP,
+							TargetPort: intstr.IntOrString{IntVal: 8080},
+						},
 					},
 				},
-			},
+			}
+			services = append(services, service)
 		}
-		services = append(services, service)
 	}
 
 	return services, nil
@@ -428,13 +444,22 @@ func renderDeploymentPodSpecContainerPorts(swInstance *sitewhereiov1alpha4.SiteW
 
 	// Handle Instance Management special case
 	if swMicroservice.GetName() == "instance-management" {
-		var instanceMangementContinerPorts = []corev1.ContainerPort{
-			corev1.ContainerPort{
-				ContainerPort: 8080,
-				Protocol:      corev1.ProtocolTCP,
-			},
+		var hasExtraPort bool = false
+		for _, cp := range containerPorts {
+			if cp.ContainerPort == 8080 && cp.Protocol == corev1.ProtocolTCP {
+				hasExtraPort = true
+				break
+			}
 		}
-		containerPorts = append(containerPorts, instanceMangementContinerPorts...)
+		if !hasExtraPort {
+			var instanceMangementContinerPorts = []corev1.ContainerPort{
+				corev1.ContainerPort{
+					ContainerPort: 8080,
+					Protocol:      corev1.ProtocolTCP,
+				},
+			}
+			containerPorts = append(containerPorts, instanceMangementContinerPorts...)
+		}
 	}
 
 	return containerPorts
