@@ -87,6 +87,9 @@ func RenderMicroservicesServiceAccount(swInstance *sitewhereiov1alpha4.SiteWhere
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      swInstance.GetName(),
 			Namespace: namespace.GetName(),
+			Labels: map[string]string{
+				"istio-injection": "enabled",
+			},
 		},
 	}, nil
 }
