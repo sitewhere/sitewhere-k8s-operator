@@ -1,4 +1,4 @@
-# permissions for end users to view instancedatasettemplates.
+# permissions for end users to view instancedatasets.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - templates.sitewhere.io
   resources:
-  - instancedatasettemplates
+  - instancedatasets
   verbs:
   - get
   - list
@@ -15,6 +15,6 @@ rules:
 - apiGroups:
   - templates.sitewhere.io
   resources:
-  - instancedatasettemplates/status
+  - instancedatasets/status
   verbs:
   - get

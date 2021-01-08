@@ -20,17 +20,21 @@ import (
 	"flag"
 	"os"
 
+	// Import all Kubernetes client auth plugins (e.g. Azure, GCP, OIDC, etc.)
+	// to ensure that exec-entrypoint and run can make use of them.
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
+
 	"k8s.io/apimachinery/pkg/runtime"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
-	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	ctrl "sigs.k8s.io/controller-runtime"
+	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
 	scriptingsitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/scripting.sitewhere.io/v1alpha4"
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
 	templatessitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
-	"github.com/sitewhere/sitewhere-k8s-operator/controllers"
+	sitewhereiocontrollers "github.com/sitewhere/sitewhere-k8s-operator/controllers/sitewhere.io"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -51,69 +55,69 @@ func init() {
 func main() {
 	var metricsAddr string
 	var enableLeaderElection bool
-	flag.StringVar(&metricsAddr, "metrics-addr", ":8080", "The address the metric endpoint binds to.")
-	flag.BoolVar(&enableLeaderElection, "enable-leader-election", false,
+	var probeAddr string
+	flag.StringVar(&metricsAddr, "metrics-bind-address", ":8080", "The address the metric endpoint binds to.")
+	flag.StringVar(&probeAddr, "health-probe-bind-address", ":8081", "The address the probe endpoint binds to.")
+	flag.BoolVar(&enableLeaderElection, "leader-elect", false,
 		"Enable leader election for controller manager. "+
 			"Enabling this will ensure there is only one active controller manager.")
+	opts := zap.Options{
+		Development: true,
+	}
+	opts.BindFlags(flag.CommandLine)
 	flag.Parse()
 
-	ctrl.SetLogger(zap.New(zap.UseDevMode(true)))
+	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:             scheme,
-		MetricsBindAddress: metricsAddr,
-		Port:               9443,
-		LeaderElection:     enableLeaderElection,
-		LeaderElectionID:   "d4bd861b.sitewhere.io",
+		Scheme:                 scheme,
+		MetricsBindAddress:     metricsAddr,
+		Port:                   9443,
+		HealthProbeBindAddress: probeAddr,
+		LeaderElection:         enableLeaderElection,
+		LeaderElectionID:       "sitewhere-k8s-operator-lock",
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
-
-	if err = (&controllers.SiteWhereInstanceReconciler{
+	if err = (&sitewhereiocontrollers.SiteWhereInstanceReconciler{
 		Client:   mgr.GetClient(),
 		Recorder: mgr.GetEventRecorderFor("SiteWhereInstance"),
-		Log:      ctrl.Log.WithName("controllers").WithName("SiteWhereInstance"),
+		Log:      ctrl.Log.WithName("controllers").WithName("sitewhere.io").WithName("SiteWhereInstance"),
 		Scheme:   mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereInstance")
 		os.Exit(1)
 	}
-	if err = (&controllers.SiteWhereMicroserviceReconciler{
+	if err = (&sitewhereiocontrollers.SiteWhereMicroserviceReconciler{
 		Client:   mgr.GetClient(),
 		Recorder: mgr.GetEventRecorderFor("SiteWhereMicroservice"),
-		Log:      ctrl.Log.WithName("controllers").WithName("SiteWhereMicroservice"),
+		Log:      ctrl.Log.WithName("controllers").WithName("sitewhere.io").WithName("SiteWhereMicroservice"),
 		Scheme:   mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereMicroservice")
 		os.Exit(1)
 	}
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&sitewhereiov1alpha4.SiteWhereInstance{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "SiteWhereInstance")
-			os.Exit(1)
-		}
-	}
-	if err = (&controllers.SiteWhereTenantReconciler{
+	if err = (&sitewhereiocontrollers.SiteWhereTenantReconciler{
 		Client:   mgr.GetClient(),
 		Recorder: mgr.GetEventRecorderFor("SiteWhereTenant"),
-		Log:      ctrl.Log.WithName("controllers").WithName("SiteWhereTenant"),
+		Log:      ctrl.Log.WithName("controllers").WithName("sitewhere.io").WithName("SiteWhereTenant"),
 		Scheme:   mgr.GetScheme(),
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereTenant")
 		os.Exit(1)
 	}
-	if err = (&controllers.SiteWhereTenantEngineReconciler{
-		Client:   mgr.GetClient(),
-		Recorder: mgr.GetEventRecorderFor("SiteWhereTenantEngine"),
-		Log:      ctrl.Log.WithName("controllers").WithName("SiteWhereTenantEngine"),
-		Scheme:   mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereTenantEngine")
+	// +kubebuilder:scaffold:builder
+
+	if err := mgr.AddHealthzCheck("health", healthz.Ping); err != nil {
+		setupLog.Error(err, "unable to set up health check")
 		os.Exit(1)
 	}
-	// +kubebuilder:scaffold:builder
+	if err := mgr.AddReadyzCheck("check", healthz.Ping); err != nil {
+		setupLog.Error(err, "unable to set up ready check")
+		os.Exit(1)
+	}
 
 	setupLog.Info("starting manager")
 	if err := mgr.Start(ctrl.SetupSignalHandler()); err != nil {

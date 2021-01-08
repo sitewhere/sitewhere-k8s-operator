@@ -1,4 +1,4 @@
-# permissions for end users to view sitewheretenants.
+# permissions for end users to view tenants.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewheretenants
+  - tenants
   verbs:
   - get
   - list
@@ -15,6 +15,6 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewheretenants/status
+  - tenants/status
   verbs:
   - get

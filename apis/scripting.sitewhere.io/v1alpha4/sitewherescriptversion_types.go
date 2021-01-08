@@ -37,7 +37,7 @@ type SiteWhereScriptVersionStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=scriptversions,scope=Namespaced,singular=scriptversion,shortName=swscrv,categories=sitewhere-io;core-sitewhere-io
 
-// SiteWhereScriptVersion is the Schema for the sitewherescriptversions API
+// SiteWhereScriptVersion is the Schema for the scriptversions API
 type SiteWhereScriptVersion struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

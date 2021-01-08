@@ -47,7 +47,7 @@ type SiteWhereScriptStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=scripts,scope=Namespaced,singular=script,shortName=swscr,categories=sitewhere-io;core-sitewhere-io
 
-// SiteWhereScript is the Schema for the sitewherescripts API
+// SiteWhereScript is the Schema for the scripts API
 type SiteWhereScript struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

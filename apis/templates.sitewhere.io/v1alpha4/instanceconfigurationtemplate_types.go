@@ -37,7 +37,7 @@ type InstanceConfigurationTemplateStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=instanceconfigurations,scope=Cluster,singular=instanceconfiguration,shortName=ict,categories=sitewhere-io;core-sitewhere-io
 
-// InstanceConfigurationTemplate is the Schema for the instanceconfigurationtemplates API
+// InstanceConfigurationTemplate is the Schema for the instanceconfigurations API
 type InstanceConfigurationTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

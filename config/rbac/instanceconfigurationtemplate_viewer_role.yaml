@@ -1,20 +1,20 @@
-# permissions for end users to view instanceconfigurationtemplates.
+# permissions for end users to view instanceconfigurations.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: instanceconfigurationtemplate-viewer-role
 rules:
 - apiGroups:
-  - sitewhere.io
+  - templates.sitewhere.io
   resources:
-  - instanceconfigurationtemplates
+  - instanceconfigurations
   verbs:
   - get
   - list
   - watch
 - apiGroups:
-  - sitewhere.io
+  - templates.sitewhere.io
   resources:
-  - instanceconfigurationtemplates/status
+  - instanceconfigurations/status
   verbs:
   - get

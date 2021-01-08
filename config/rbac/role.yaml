@@ -7,30 +7,6 @@ metadata:
   name: manager-role
 rules:
 - apiGroups:
-  - apps
-  resources:
-  - deployments
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - services
-  verbs:
-  - create
-  - delet
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
   - sitewhere.io
   resources:
   - instances
@@ -45,6 +21,12 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
+  - instances/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - sitewhere.io
+  resources:
   - instances/status
   verbs:
   - get
@@ -53,7 +35,7 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewheremicroservices
+  - microservices
   verbs:
   - create
   - delete
@@ -65,7 +47,13 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewheremicroservices/status
+  - microservices/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - microservices/status
   verbs:
   - get
   - patch
@@ -73,27 +61,7 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewheretenantengines
-  verbs:
-  - create
-  - delete
-  - get
-  - list
-  - patch
-  - update
-  - watch
-- apiGroups:
-  - sitewhere.io
-  resources:
-  - sitewheretenantengines/status
-  verbs:
-  - get
-  - patch
-  - update
-- apiGroups:
-  - sitewhere.io
-  resources:
-  - sitewheretenants
+  - tenants
   verbs:
   - create
   - delete
@@ -105,7 +73,13 @@ rules:
 - apiGroups:
   - sitewhere.io
   resources:
-  - sitewheretenants/status
+  - tenants/finalizers
+  verbs:
+  - update
+- apiGroups:
+  - sitewhere.io
+  resources:
+  - tenants/status
   verbs:
   - get
   - patch

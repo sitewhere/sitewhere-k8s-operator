@@ -1,47 +1,66 @@
-layout: go.kubebuilder.io/v2
+layout: go.kubebuilder.io/v3
 multigroup: true
 projectName: sitewhere-k8s-operator
 repo: github.com/sitewhere/sitewhere-k8s-operator
 resources:
-- group: sitewhere.io
+- crdVersion: v1
+  group: sitewhere.io
   kind: SiteWhereInstance
   version: v1alpha4
-- group: sitewhere.io
+  webhookVersion: v1
+- crdVersion: v1
+  group: sitewhere.io
   kind: SiteWhereMicroservice
   version: v1alpha4
-- group: sitewhere.io
+- crdVersion: v1
+  group: sitewhere.io
+  kind: SiteWhereTenant
+  version: v1alpha4
+- crdVersion: v1
+  group: sitewhere.io
   kind: SiteWhereTenantEngine
   version: v1alpha4
-- group: templates.sitewhere.io
-  kind: TenantEngineConfigurationTemplate
-  version: v1alpha4
-- group: templates.sitewhere.io
-  kind: TenantConfigurationTemplate
-  version: v1alpha4
-- group: templates.sitewhere.io
-  kind: InstanceConfigurationTemplate
-  version: v1alpha4
-- group: templates.sitewhere.io
-  kind: InstanceDatasetTemplate
-  version: v1alpha4
-- group: templates.sitewhere.io
-  kind: TenantDatasetTemplate
-  version: v1alpha4
-- group: templates.sitewhere.io
-  kind: TenantEngineDatasetTemplate
-  version: v1alpha4
-- group: scripting.sitewhere.io
-  kind: SiteWhereScriptCategory
-  version: v1alpha4
-- group: scripting.sitewhere.io
-  kind: SiteWhereScriptTemplate
-  version: v1alpha4
-- group: scripting.sitewhere.io
+- crdVersion: v1
+  group: scripting.sitewhere.io
   kind: SiteWhereScript
   version: v1alpha4
-- group: scripting.sitewhere.io
+- crdVersion: v1
+  group: scripting.sitewhere.io
+  kind: SiteWhereScriptCategory
+  version: v1alpha4
+- crdVersion: v1
+  group: scripting.sitewhere.io
+  kind: SiteWhereScriptTemplate
+  version: v1alpha4
+- crdVersion: v1
+  group: scripting.sitewhere.io
   kind: SiteWhereScriptVersion
+  version: v1alpha4
+- crdVersion: v1
+  group: templates.sitewhere.io
+  kind: InstanceConfigurationTemplate
+  version: v1alpha4
+- crdVersion: v1
+  group: templates.sitewhere.io
+  kind: InstanceDatasetTemplate
+  version: v1alpha4
+- crdVersion: v1
+  group: templates.sitewhere.io
+  kind: TenantConfigurationTemplate
+  version: v1alpha4
+- crdVersion: v1
+  group: templates.sitewhere.io
+  kind: TenantDatasetTemplate
+  version: v1alpha4
+- crdVersion: v1
+  group: templates.sitewhere.io
+  kind: TenantEngineConfigurationTemplate
+  version: v1alpha4
+- crdVersion: v1
+  group: templates.sitewhere.io
+  kind: TenantEngineDatasetTemplate
   version: v1alpha4
 version: 3-alpha
 plugins:
-  go.sdk.operatorframework.io/v2-alpha: {}
+  manifests.sdk.operatorframework.io/v2: {}
+  scorecard.sdk.operatorframework.io/v2: {}

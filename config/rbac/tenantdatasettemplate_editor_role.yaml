@@ -1,4 +1,4 @@
-# permissions for end users to edit tenantdatasettemplates.
+# permissions for end users to edit tenantdatasets.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - templates.sitewhere.io
   resources:
-  - tenantdatasettemplates
+  - tenantdatasets
   verbs:
   - create
   - delete
@@ -19,6 +19,6 @@ rules:
 - apiGroups:
   - templates.sitewhere.io
   resources:
-  - tenantdatasettemplates/status
+  - tenantdatasets/status
   verbs:
   - get

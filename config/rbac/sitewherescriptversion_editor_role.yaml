@@ -1,4 +1,4 @@
-# permissions for end users to edit sitewherescriptversions.
+# permissions for end users to edit scriptversions.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - scripting.sitewhere.io
   resources:
-  - sitewherescriptversions
+  - scriptversions
   verbs:
   - create
   - delete
@@ -19,6 +19,6 @@ rules:
 - apiGroups:
   - scripting.sitewhere.io
   resources:
-  - sitewherescriptversions/status
+  - scriptversions/status
   verbs:
   - get
