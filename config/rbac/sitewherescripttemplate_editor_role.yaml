@@ -1,4 +1,4 @@
-# permissions for end users to edit sitewherescripttemplates.
+# permissions for end users to edit scripttemplates.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - scripting.sitewhere.io
   resources:
-  - sitewherescripttemplates
+  - scripttemplates
   verbs:
   - create
   - delete
@@ -19,6 +19,6 @@ rules:
 - apiGroups:
   - scripting.sitewhere.io
   resources:
-  - sitewherescripttemplates/status
+  - scripttemplates/status
   verbs:
   - get

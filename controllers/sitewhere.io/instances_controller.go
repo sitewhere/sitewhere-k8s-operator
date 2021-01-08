@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package controllers
+package sitewhereio
 
 import (
 	"context"
@@ -42,9 +42,18 @@ type SiteWhereInstanceReconciler struct {
 
 // +kubebuilder:rbac:groups=sitewhere.io,resources=instances,verbs=get;list;watch;create;update;patch;delete
 // +kubebuilder:rbac:groups=sitewhere.io,resources=instances/status,verbs=get;update;patch
+// +kubebuilder:rbac:groups=sitewhere.io,resources=instances/finalizers,verbs=update
 
-func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, error) {
-	ctx := context.Background()
+// Reconcile is part of the main kubernetes reconciliation loop which aims to
+// move the current state of the cluster closer to the desired state.
+// TODO(user): Modify the Reconcile function to compare the state specified by
+// the SiteWhereInstance object against the actual cluster state, and then
+// perform operations to make the cluster state reflect the state specified by
+// the user.
+//
+// For more details, check Reconcile and its Result here:
+// - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.0/pkg/reconcile
+func (r *SiteWhereInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
 	log := r.Log.WithValues("sitewhereinstance", req.NamespacedName)
 	log.Info("Reconcile SiteWhere Instance")
 
@@ -219,7 +228,7 @@ func (r *SiteWhereInstanceReconciler) Reconcile(req ctrl.Request) (ctrl.Result, 
 	return ctrl.Result{}, nil
 }
 
-// SetupWithManager setups up k8s controller.
+// SetupWithManager sets up the controller with the Manager.
 func (r *SiteWhereInstanceReconciler) SetupWithManager(mgr ctrl.Manager) error {
 	return ctrl.NewControllerManagedBy(mgr).
 		For(&sitewhereiov1alpha4.SiteWhereInstance{}).

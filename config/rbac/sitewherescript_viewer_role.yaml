@@ -1,4 +1,4 @@
-# permissions for end users to view sitewherescripts.
+# permissions for end users to view scripts.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -7,7 +7,7 @@ rules:
 - apiGroups:
   - scripting.sitewhere.io
   resources:
-  - sitewherescripts
+  - scripts
   verbs:
   - get
   - list
@@ -15,6 +15,6 @@ rules:
 - apiGroups:
   - scripting.sitewhere.io
   resources:
-  - sitewherescripts/status
+  - scripts/status
   verbs:
   - get

@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// Package v1alpha4 contains API Schema definitions for the sitewhere.io v1alpha4 API group
+// Package v1alpha4 contains API Schema definitions for the templates.sitewhere.io v1alpha4 API group
 // +kubebuilder:object:generate=true
 // +groupName=templates.sitewhere.io
 package v1alpha4

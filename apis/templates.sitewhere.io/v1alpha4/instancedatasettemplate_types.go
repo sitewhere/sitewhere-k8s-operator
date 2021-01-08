@@ -34,7 +34,7 @@ type InstanceDatasetTemplateStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=instancedatasets,scope=Cluster,singular=instancedataset,shortName=idt,categories=sitewhere-io;core-sitewhere-io
 
-// InstanceDatasetTemplate is the Schema for the instancedatasettemplates API
+// InstanceDatasetTemplate is the Schema for the instancedatasets API
 type InstanceDatasetTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

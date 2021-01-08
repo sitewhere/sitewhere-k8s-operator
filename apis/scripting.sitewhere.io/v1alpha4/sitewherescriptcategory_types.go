@@ -38,7 +38,7 @@ type SiteWhereScriptCategoryStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=scriptcategories,scope=Cluster,singular=scriptcategory,shortName=swscrc,categories=sitewhere-io;core-sitewhere-io
 
-// SiteWhereScriptCategory is the Schema for the sitewherescriptcategories API
+// SiteWhereScriptCategory is the Schema for the scriptcategories API
 type SiteWhereScriptCategory struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

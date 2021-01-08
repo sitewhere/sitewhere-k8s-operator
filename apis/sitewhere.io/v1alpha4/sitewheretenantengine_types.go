@@ -37,7 +37,7 @@ type SiteWhereTenantEngineStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=tenantengines,scope=Namespaced,singular=tenantengine,shortName=swte,categories=sitewhere-io;core-sitewhere-io
 
-// SiteWhereTenantEngine is the Schema for the sitewheretenantengines API
+// SiteWhereTenantEngine is the Schema for the tenantengines API
 type SiteWhereTenantEngine struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

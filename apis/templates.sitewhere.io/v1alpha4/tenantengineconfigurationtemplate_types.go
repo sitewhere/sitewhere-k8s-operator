@@ -37,7 +37,7 @@ type TenantEngineConfigurationTemplateStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=tenantengineconfigurations,scope=Cluster,singular=tenantengineconfiguration,shortName=tect,categories=sitewhere-io;core-sitewhere-io
 
-// TenantEngineConfigurationTemplate is the Schema for the tenantengineconfigurationtemplates API
+// TenantEngineConfigurationTemplate is the Schema for the tenantengineconfigurations API
 type TenantEngineConfigurationTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`

@@ -36,7 +36,7 @@ type TenantEngineDatasetTemplateStatus struct {
 // +kubebuilder:subresource:status
 // +kubebuilder:resource:path=tenantenginedatasets,scope=Cluster,singular=tenantenginedataset,shortName=tedt,categories=sitewhere-io;core-sitewhere-io
 
-// TenantEngineDatasetTemplate is the Schema for the tenantenginedatasettemplates API
+// TenantEngineDatasetTemplate is the Schema for the tenantenginedatasets API
 type TenantEngineDatasetTemplate struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
