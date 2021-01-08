@@ -73,6 +73,9 @@ func RenderInstanceNamespace(swInstance *sitewhereiov1alpha4.SiteWhereInstance) 
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name: swInstance.GetName(),
+			Labels: map[string]string{
+				"istio-injection": "enabled",
+			},
 		},
 	}, nil
 }
@@ -87,9 +90,6 @@ func RenderMicroservicesServiceAccount(swInstance *sitewhereiov1alpha4.SiteWhere
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      swInstance.GetName(),
 			Namespace: namespace.GetName(),
-			Labels: map[string]string{
-				"istio-injection": "enabled",
-			},
 		},
 	}, nil
 }
