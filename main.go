@@ -90,12 +90,6 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereInstance")
 		os.Exit(1)
 	}
-	if os.Getenv("ENABLE_WEBHOOKS") != "false" {
-		if err = (&sitewhereiov1alpha4.SiteWhereInstance{}).SetupWebhookWithManager(mgr); err != nil {
-			setupLog.Error(err, "unable to create webhook", "webhook", "SiteWhereInstance")
-			os.Exit(1)
-		}
-	}
 	if err = (&sitewhereiocontrollers.SiteWhereMicroserviceReconciler{
 		Client:   mgr.GetClient(),
 		Recorder: mgr.GetEventRecorderFor("SiteWhereMicroservice"),

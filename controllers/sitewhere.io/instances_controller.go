@@ -54,7 +54,7 @@ type SiteWhereInstanceReconciler struct {
 // For more details, check Reconcile and its Result here:
 // - https://pkg.go.dev/sigs.k8s.io/controller-runtime@v0.7.0/pkg/reconcile
 func (r *SiteWhereInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ctrl.Result, error) {
-	log := r.Log.WithValues("sitewhereinstance", req.NamespacedName)
+	log := r.Log.WithValues("instance", req.NamespacedName)
 	log.Info("Reconcile SiteWhere Instance")
 
 	var swInstance sitewhereiov1alpha4.SiteWhereInstance
