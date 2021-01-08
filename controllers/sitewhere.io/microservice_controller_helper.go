@@ -154,6 +154,12 @@ func RenderMicroservicesDeployment(swInstance *sitewhereiov1alpha4.SiteWhereInst
 	var podSpec = renderDeploymentPodSpec(swInstance, swMicroservice)
 	var podAnnotations = renderPodAnnotations(swInstance, swMicroservice)
 
+	if podAnnotations == nil {
+		podAnnotations = make(map[string]string)
+	}
+	// Add Istio excludeOutboundIPRanges
+	podAnnotations["traffic.sidecar.istio.io/excludeOutboundIPRanges"] = "0.0.0.0/0"
+
 	var deployment = &appsv1.Deployment{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       deploymentKind,
