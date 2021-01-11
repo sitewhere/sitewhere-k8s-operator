@@ -23,6 +23,9 @@ import (
 
 // SiteWhereTenantEngineSpec defines the desired state of SiteWhereTenantEngine
 type SiteWhereTenantEngineSpec struct {
+	// +nullable
+	// +kubebuilder:pruning:PreserveUnknownFields
+
 	// Configuration is the configuration for the tenant
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
