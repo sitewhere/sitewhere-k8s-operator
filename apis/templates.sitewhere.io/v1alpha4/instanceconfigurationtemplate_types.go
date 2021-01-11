@@ -24,6 +24,7 @@ import (
 // InstanceConfigurationTemplateSpec defines the desired state of InstanceConfigurationTemplate
 type InstanceConfigurationTemplateSpec struct {
 	// +nullable
+	// +kubebuilder:pruning:PreserveUnknownFields
 
 	// Configuration is the configuration for the tenant
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`

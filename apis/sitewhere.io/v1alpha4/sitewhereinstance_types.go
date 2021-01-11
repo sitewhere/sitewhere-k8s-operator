@@ -69,8 +69,12 @@ type SiteWhereInstanceSpec struct {
 	DatasetTemplate string `json:"datasetTemplate,omitempty"`
 	// DockerSpec is the
 	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
+
+	// +nullable
+	// +kubebuilder:pruning:PreserveUnknownFields
 	// Configuration is the configuration of the instance
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
+
 	// Microservices microservices to create
 	Microservices []SiteWhereMicroserviceSpec `json:"microservices,omitempty"`
 }

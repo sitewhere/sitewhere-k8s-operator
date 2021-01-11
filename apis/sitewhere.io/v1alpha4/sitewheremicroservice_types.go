@@ -181,24 +181,30 @@ type SiteWhereMicroserviceSpec struct {
 	// Multitenant indicates whether microservice has tenant engines
 	Multitenant bool `json:"multitenant,omitempty"`
 
-	// PodSpec is the microservice pod specificacion
 	// +optional
+
+	// PodSpec is the microservice pod specificacion
 	PodSpec *MicroservicePodSpecification `json:"podSpec,omitempty"`
 
-	// ServiceSpec is the Service specification
 	// +optional
+
+	// ServiceSpec is the Service specification
 	SerivceSpec *MicroserviceServiceSpecification `json:"serviceSpec,omitempty"`
 
-	// Debug is the Debug specification
 	// +optional
+
+	// Debug is the Debug specification
 	Debug *MicroserviceDebugSpecification `json:"debug,omitempty"`
 
-	// Logging is the Logging specificacion
 	// +optional
+
+	// Logging is the Logging specificacion
 	Logging *MicroserviceLoggingSpecification `json:"logging,omitempty"`
 
+	// +nullable
+	// +kubebuilder:pruning:PreserveUnknownFields
+
 	// Configuration is the configuration of the microservice
-	// +optional
 	Configuration *runtime.RawExtension `json:"configuration,omitempty"`
 }
 
