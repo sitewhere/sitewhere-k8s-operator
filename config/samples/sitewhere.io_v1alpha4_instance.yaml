@@ -8,4 +8,4 @@ spec:
   dockerSpec:
     registry: docker.io
     repository: sitewhere
-    tag: 3.0.0.beta3
+    tag: 3.0.1
