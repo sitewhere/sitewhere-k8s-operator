@@ -19,3 +19,10 @@ after_failure:
   - wget https://raw.githubusercontent.com/DiscordHooks/travis-ci-discord-webhook/master/send.sh
   - chmod +x send.sh
   - "./send.sh failure $WEBHOOK_URL"
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && make docker-push
+  on:
+    tags: true
