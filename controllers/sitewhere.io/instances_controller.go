@@ -23,6 +23,7 @@ import (
 	"github.com/go-logr/logr"
 	core "k8s.io/api/core/v1"
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/tools/record"
@@ -30,14 +31,16 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
+	versionedclient "istio.io/client-go/pkg/clientset/versioned"
 )
 
 // SiteWhereInstanceReconciler reconciles a SiteWhereInstance object
 type SiteWhereInstanceReconciler struct {
 	client.Client
-	Log      logr.Logger
-	Recorder record.EventRecorder
-	Scheme   *runtime.Scheme
+	Log                logr.Logger
+	Recorder           record.EventRecorder
+	Scheme             *runtime.Scheme
+	VersionedClientset *versionedclient.Clientset
 }
 
 // +kubebuilder:rbac:groups=sitewhere.io,resources=instances,verbs=get;list;watch;create;update;patch;delete
@@ -230,6 +233,28 @@ func (r *SiteWhereInstanceReconciler) Reconcile(ctx context.Context, req ctrl.Re
 				}
 			}
 		}
+	}
+
+	vs, err := RenderVirtualService(&swInstance, namespace)
+	if err != nil {
+		log.Error(err, "cannot render virtual service for instace")
+		return ctrl.Result{}, err
+	}
+	// Set ownership
+	ctrl.SetControllerReference(&swInstance, vs, r.Scheme)
+
+	// Create Virtual Service
+	_, err = r.VersionedClientset.NetworkingV1alpha3().VirtualServices(namespace.GetName()).Create(context.TODO(), vs, metav1.CreateOptions{})
+	if err != nil {
+		if apierrors.IsAlreadyExists(err) {
+			log.Info(fmt.Sprintf("VirtualService %s already exists", vs.GetName()))
+		} else {
+			log.Error(err, "can not create VirtualService from instance")
+			return ctrl.Result{}, err
+		}
+	} else {
+		var message = fmt.Sprintf("VirtualService %s for instance created.", vs.GetName())
+		r.Recorder.Event(&swInstance, core.EventTypeNormal, "Updated", message)
 	}
 
 	return ctrl.Result{}, nil

@@ -31,6 +31,9 @@ import (
 
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
 	templatesv1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
+
+	networkingv1alpha3 "istio.io/api/networking/v1alpha3"
+	v1alpha3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 )
 
 const (
@@ -49,6 +52,10 @@ const (
 const (
 	// Client Secret key
 	clientSecretKey = "client-secret"
+
+	// sitewhereGatewayName is the FQDN of sitewhere gateway
+	//	sitewhereGatewayName = "sitewhere-gateway.sitewhere-system.svc.cluster.local"
+	sitewhereGatewayName = "sitewhere-system/sitewhere-gateway"
 )
 
 //RenderMicroservices derives SiteWhereMicroservice from a SiteWhereInstance
@@ -275,4 +282,119 @@ func RenderMicroseviceFromSpecs(msSpec sitewhereiov1alpha4.SiteWhereMicroservice
 		},
 		Spec: msSpec,
 	}
+}
+
+// RenderVirtualService renders a Istio Virtual Service
+func RenderVirtualService(swInstance *sitewhereiov1alpha4.SiteWhereInstance, ns *corev1.Namespace) (*v1alpha3.VirtualService, error) {
+	var vsName = fmt.Sprintf("%s-vs", swInstance.GetName())
+	var vsRouteHost = fmt.Sprintf("instance-management.%s.svc.cluster.local", ns.GetName())
+	var prefixValue = fmt.Sprintf("/%s", swInstance.GetName())
+
+	var vs *v1alpha3.VirtualService = &v1alpha3.VirtualService{
+		ObjectMeta: metav1.ObjectMeta{
+			Namespace: ns.GetName(),
+			Name:      vsName,
+		},
+		Spec: networkingv1alpha3.VirtualService{
+			Gateways: []string{
+				sitewhereGatewayName,
+			},
+			Hosts: []string{
+				"*",
+			},
+			Http: []*networkingv1alpha3.HTTPRoute{
+				&networkingv1alpha3.HTTPRoute{
+					Name: "swagger",
+					Match: []*networkingv1alpha3.HTTPMatchRequest{
+						&networkingv1alpha3.HTTPMatchRequest{
+							Uri: &networkingv1alpha3.StringMatch{
+								MatchType: &networkingv1alpha3.StringMatch_Prefix{
+									Prefix: fmt.Sprintf("/%s/swagger", swInstance.GetName()),
+								},
+							},
+						},
+						&networkingv1alpha3.HTTPMatchRequest{
+							Uri: &networkingv1alpha3.StringMatch{
+								MatchType: &networkingv1alpha3.StringMatch_Prefix{
+									Prefix: fmt.Sprintf("/%s/swagger/", swInstance.GetName()),
+								},
+							},
+						},
+					},
+					Rewrite: &networkingv1alpha3.HTTPRewrite{
+						Uri: "/swagger",
+					},
+					Route: []*networkingv1alpha3.HTTPRouteDestination{
+						&networkingv1alpha3.HTTPRouteDestination{
+							Destination: &networkingv1alpha3.Destination{
+								Host: vsRouteHost,
+								Port: &networkingv1alpha3.PortSelector{
+									Number: 8080,
+								},
+							},
+						},
+					},
+				},
+				&networkingv1alpha3.HTTPRoute{
+					Name: "openapi",
+					Match: []*networkingv1alpha3.HTTPMatchRequest{
+						&networkingv1alpha3.HTTPMatchRequest{
+							Uri: &networkingv1alpha3.StringMatch{
+								MatchType: &networkingv1alpha3.StringMatch_Prefix{
+									Prefix: fmt.Sprintf("/%s/openapi", swInstance.GetName()),
+								},
+							},
+						},
+						&networkingv1alpha3.HTTPMatchRequest{
+							Uri: &networkingv1alpha3.StringMatch{
+								MatchType: &networkingv1alpha3.StringMatch_Prefix{
+									Prefix: fmt.Sprintf("/%s/openapi/", swInstance.GetName()),
+								},
+							},
+						},
+					},
+					Rewrite: &networkingv1alpha3.HTTPRewrite{
+						Uri: "/openapi",
+					},
+					Route: []*networkingv1alpha3.HTTPRouteDestination{
+						&networkingv1alpha3.HTTPRouteDestination{
+							Destination: &networkingv1alpha3.Destination{
+								Host: vsRouteHost,
+								Port: &networkingv1alpha3.PortSelector{
+									Number: 8080,
+								},
+							},
+						},
+					},
+				},
+				&networkingv1alpha3.HTTPRoute{
+					Name: "instance-rest",
+					Match: []*networkingv1alpha3.HTTPMatchRequest{
+						&networkingv1alpha3.HTTPMatchRequest{
+							Uri: &networkingv1alpha3.StringMatch{
+								MatchType: &networkingv1alpha3.StringMatch_Prefix{
+									Prefix: prefixValue,
+								},
+							},
+						},
+					},
+					Rewrite: &networkingv1alpha3.HTTPRewrite{
+						Uri: "/sitewhere",
+					},
+					Route: []*networkingv1alpha3.HTTPRouteDestination{
+						&networkingv1alpha3.HTTPRouteDestination{
+							Destination: &networkingv1alpha3.Destination{
+								Host: vsRouteHost,
+								Port: &networkingv1alpha3.PortSelector{
+									Number: 8080,
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	return vs, nil
 }
