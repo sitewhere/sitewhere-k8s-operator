@@ -31,6 +31,8 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
+	versionedclient "istio.io/client-go/pkg/clientset/versioned"
+
 	scriptingsitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/scripting.sitewhere.io/v1alpha4"
 	sitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/sitewhere.io/v1alpha4"
 	templatessitewhereiov1alpha4 "github.com/sitewhere/sitewhere-k8s-operator/apis/templates.sitewhere.io/v1alpha4"
@@ -69,7 +71,9 @@ func main() {
 
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&opts)))
 
-	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
+	restconfig := ctrl.GetConfigOrDie()
+
+	mgr, err := ctrl.NewManager(restconfig, ctrl.Options{
 		Scheme:                 scheme,
 		MetricsBindAddress:     metricsAddr,
 		Port:                   9443,
@@ -81,11 +85,19 @@ func main() {
 		setupLog.Error(err, "unable to start manager")
 		os.Exit(1)
 	}
+
+	ic, err := versionedclient.NewForConfig(restconfig)
+	if err != nil {
+		setupLog.Error(err, "unable to start manager")
+		os.Exit(1)
+	}
+
 	if err = (&sitewhereiocontrollers.SiteWhereInstanceReconciler{
-		Client:   mgr.GetClient(),
-		Recorder: mgr.GetEventRecorderFor("SiteWhereInstance"),
-		Log:      ctrl.Log.WithName("controllers").WithName("sitewhere.io").WithName("SiteWhereInstance"),
-		Scheme:   mgr.GetScheme(),
+		Client:             mgr.GetClient(),
+		Recorder:           mgr.GetEventRecorderFor("SiteWhereInstance"),
+		Log:                ctrl.Log.WithName("controllers").WithName("sitewhere.io").WithName("SiteWhereInstance"),
+		Scheme:             mgr.GetScheme(),
+		VersionedClientset: ic,
 	}).SetupWithManager(mgr); err != nil {
 		setupLog.Error(err, "unable to create controller", "controller", "SiteWhereInstance")
 		os.Exit(1)
