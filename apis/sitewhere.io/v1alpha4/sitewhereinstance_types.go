@@ -41,7 +41,7 @@ const (
 const (
 	defaultRegistry   string = "docker.io"
 	defaultRepository string = "sitewhere"
-	defaultTag        string = "3.0.1"
+	defaultTag        string = "latest"
 )
 
 // DefaultDockerSpec is th default docker spec
