@@ -83,7 +83,7 @@ docker-build: #test
 
 # Push the docker image
 docker-push:
-	docker tag ${IMG} latest
+	docker tag ${IMG} sitewhere/sitewhere-k8s-operator:latest
 	docker push ${IMG}
 	docker push latest
 
