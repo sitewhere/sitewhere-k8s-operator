@@ -83,7 +83,9 @@ docker-build: #test
 
 # Push the docker image
 docker-push:
+	docker tag ${IMG} latest
 	docker push ${IMG}
+	docker push latest
 
 # Download controller-gen locally if necessary
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
