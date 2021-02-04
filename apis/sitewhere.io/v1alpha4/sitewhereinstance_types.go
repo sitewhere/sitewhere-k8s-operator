@@ -63,10 +63,20 @@ type DockerSpec struct {
 
 // SiteWhereInstanceSpec defines the desired state of SiteWhereInstance
 type SiteWhereInstanceSpec struct {
+	// +optional
+	// Name is the name of the instance
+	Name string `json:"name,omitempty"`
+
+	// +optional
+	// Description is the description of the instance
+	Description string `json:"description,omitempty"`
+
 	// ConfigurationTemplate is the name of the configuration template of the instance
 	ConfigurationTemplate string `json:"configurationTemplate,omitempty"`
+
 	// DatasetTemplate is the name of the dataset template of the instance
 	DatasetTemplate string `json:"datasetTemplate,omitempty"`
+
 	// DockerSpec is the
 	DockerSpec *DockerSpec `json:"dockerSpec,omitempty"`
 
