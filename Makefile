@@ -85,7 +85,7 @@ docker-build: #test
 docker-push:
 	docker tag ${IMG} sitewhere/sitewhere-k8s-operator:latest
 	docker push ${IMG}
-	docker push latest
+	docker push sitewhere/sitewhere-k8s-operator:latest
 
 # Download controller-gen locally if necessary
 CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
